@@ -22,4 +22,8 @@ export class CarService {
   findAll(): Promise<Car[]> {
     return this.carRepository.find();
   }
+
+  update(id: number, fieldsToUpdate: Partial<CreateCarDto>): Promise<UpdateResult> {
+    return this.carRepository.update({ id }, fieldsToUpdate);
+  }
 }

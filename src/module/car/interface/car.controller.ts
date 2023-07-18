@@ -1,18 +1,21 @@
 
-import { Body, Controller, Get, Post, Delete, Param } from '@nestjs/common';
-
+import { Body, Controller, Param, Post, Patch } from '@nestjs/common';
 import { CarService } from '../application/car.service';
 import { CreateCarDto } from './create-car.dto';
 import { Car } from '../domain/car.entity';
-import { DeleteResult } from 'typeorm';
+import { UpdateResult } from 'typeorm';
 
 @Controller('cars')
 export class CarController {
   constructor(private readonly service: CarService) {}
 
-  @Delete()
-  delete(@Param('id') id: string): Promise<DeleteResult> {
-    return this.service.delete(Number(id));
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() fieldsToUpdate: Partial<CreateCarDto>
+  ): Promise<UpdateResult> {
+    return this.service.update(Number(id), fieldsToUpdate);
+
   }
 
   @Post()

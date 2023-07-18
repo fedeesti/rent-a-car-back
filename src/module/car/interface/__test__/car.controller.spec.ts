@@ -27,18 +27,20 @@ describe('CarController', () => {
     expect(carController).toBeDefined();
   });
 
-  describe('DELETE /cars/:id', () => {
-    it('should return an object specifying a row has been deleted.', async () => {
-      jest
-        .spyOn(carService, 'delete')
-        .mockImplementation(() =>
-          Promise.resolve({ raw: [], affected: 1 } as unknown as Promise<DeleteResult>)
-        );
+  describe('PATCH /cars/:id', () => {
+    it('should return an object specifying a row has been updated', async () => {
+      const mockPatchResult = {
+        generatedMaps: [],
+        raw: [],
+        affected: 1,
+      };
 
-      const deleteCar = await carController.delete('1');
+      jest.spyOn(carService, 'update').mockImplementation(() => Promise.resolve(mockPatchResult));
 
-      expect(deleteCar.affected).toEqual(1);
-      expect(carService.delete).toHaveBeenCalledTimes(1);
+      const updatedCar = await carController.update('1', { brand: 'Peugeot' });
+
+      expect(updatedCar.affected).toEqual(1);
+      expect(carService.update).toHaveBeenCalledTimes(1);
     });
   });
 
