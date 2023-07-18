@@ -5,6 +5,7 @@ import { CarModule } from '../../car.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Car } from '../../domain/car.entity';
 import { CreateCarDto } from '../create-car.dto';
+import { DeleteResult } from 'typeorm';
 
 describe('CarController', () => {
   let carController: CarController;
@@ -26,31 +27,18 @@ describe('CarController', () => {
     expect(carController).toBeDefined();
   });
 
-  describe('GET /users/:id', () => {
-    it('should return a car', async () => {
-      const mockCar = {
-        id: 1,
-        brand: 'test',
-        model: 'test',
-        color: 'test',
-        img: 'test.png',
-        kms: 80,
-        passengers: 1,
-        price: 1,
-        year: 2000,
-        transmission: 'manual',
-        airConditioner: true,
-        createdAt: new Date(),
-      };
-
+  describe('DELETE /cars/:id', () => {
+    it('should return an object specifying a row has been deleted.', async () => {
       jest
-        .spyOn(carService, 'findById')
-        .mockImplementation(() => Promise.resolve(mockCar as unknown as Promise<Car>));
+        .spyOn(carService, 'delete')
+        .mockImplementation(() =>
+          Promise.resolve({ raw: [], affected: 1 } as unknown as Promise<DeleteResult>)
+        );
 
-      const car: Car = await carController.getUser('1');
+      const deleteCar = await carController.delete('1');
 
-      expect(car).toEqual(mockCar);
-      expect(carService.findById).toHaveBeenCalledTimes(1);
+      expect(deleteCar.affected).toEqual(1);
+      expect(carService.delete).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { Car } from '../domain/car.entity';
 import { CreateCarDto } from '../interface/create-car.dto';
 
@@ -16,11 +16,9 @@ export class CarService {
     });
   }
 
-  create(car: CreateCarDto): Promise<Car> {
-    const newCar = this.carRepository.create(car);
-    return this.carRepository.save(newCar);
-  }
-
+  delete(id: number): Promise<DeleteResult> {
+    return this.carRepository.delete({ id });
+}
   findAll(): Promise<Car[]> {
     return this.carRepository.find();
   }
