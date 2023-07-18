@@ -8,6 +8,14 @@ import { CreateCarDto } from '../interface/create-car.dto';
 export class CarService {
   constructor(@InjectRepository(Car) private carRepository: Repository<Car>) {}
 
+  findById(id: number): Promise<Car> {
+    return this.carRepository.findOne({
+      where: {
+        id,
+      },
+    });
+  }
+
   create(car: CreateCarDto): Promise<Car> {
     const newCar = this.carRepository.create(car);
     return this.carRepository.save(newCar);

@@ -26,6 +26,34 @@ describe('CarController', () => {
     expect(carController).toBeDefined();
   });
 
+  describe('GET /users/:id', () => {
+    it('should return a car', async () => {
+      const mockCar = {
+        id: 1,
+        brand: 'test',
+        model: 'test',
+        color: 'test',
+        img: 'test.png',
+        kms: 80,
+        passengers: 1,
+        price: 1,
+        year: 2000,
+        transmission: 'manual',
+        airConditioner: true,
+        createdAt: new Date(),
+      };
+
+      jest
+        .spyOn(carService, 'findById')
+        .mockImplementation(() => Promise.resolve(mockCar as unknown as Promise<Car>));
+
+      const car: Car = await carController.getUser('1');
+
+      expect(car).toEqual(mockCar);
+      expect(carService.findById).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('POST /cars', () => {
     it('should create a car successfully', async () => {
       jest.spyOn(carService, 'create').mockImplementation(() =>
