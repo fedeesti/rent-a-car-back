@@ -18,10 +18,8 @@ export class CarService {
 
   delete(id: number): Promise<DeleteResult> {
     return this.carRepository.delete({ id });
-  }
-
-  create(car: CreateCarDto): Promise<Car> {
-    const newCar = this.carRepository.create(car);
-    return this.carRepository.save(newCar);
+}
+  findAll(): Promise<Car[]> {
+    return this.carRepository.find();
   }
 }
