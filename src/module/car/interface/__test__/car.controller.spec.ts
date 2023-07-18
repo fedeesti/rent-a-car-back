@@ -5,6 +5,7 @@ import { CarModule } from '../../car.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Car } from '../../domain/car.entity';
 import { CreateCarDto } from '../create-car.dto';
+import { DeleteResult } from 'typeorm';
 
 describe('CarController', () => {
   let carController: CarController;
