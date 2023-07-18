@@ -26,6 +26,35 @@ describe('CarController', () => {
     expect(carController).toBeDefined();
   });
 
+  describe('GET /users', () => {
+    it('should return an array of cars', async () => {
+      const carArray = [
+        {
+          id: 1,
+          brand: 'test',
+          model: 'test',
+          color: 'test',
+          img: 'test.png',
+          kms: 1,
+          passengers: 1,
+          price: 1,
+          year: 2016,
+          transmission: 'manual',
+          airConditioner: true,
+          createdAt: '2023-07-17T17:34:27.000Z',
+        },
+      ];
+      jest
+        .spyOn(carService, 'findAll')
+        .mockImplementation(() => Promise.resolve(carArray as unknown as Promise<Car[]>));
+
+      const result = await carController.getCars();
+
+      expect(result).toHaveLength(1);
+      expect(carService.findAll).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('POST /cars', () => {
     it('should create a car successfully', async () => {
       jest.spyOn(carService, 'create').mockImplementation(() =>

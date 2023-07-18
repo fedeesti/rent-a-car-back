@@ -7,6 +7,11 @@ import { Car } from '../domain/car.entity';
 export class CarController {
   constructor(private readonly service: CarService) {}
 
+  @Get()
+  getCars(): Promise<Car[]> {
+    return this.service.findAll();
+  }
+
   @Post()
   save(@Body() newCar: CreateCarDto): Promise<Car> {
     return this.service.create(newCar);
