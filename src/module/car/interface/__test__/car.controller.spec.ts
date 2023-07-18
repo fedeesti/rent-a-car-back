@@ -26,6 +26,23 @@ describe('CarController', () => {
     expect(carController).toBeDefined();
   });
 
+  describe('PATCH /cars/:id', () => {
+    it('should return an object specifying a row has been updated', async () => {
+      const mockPatchResult = {
+        generatedMaps: [],
+        raw: [],
+        affected: 1,
+      };
+
+      jest.spyOn(carService, 'update').mockImplementation(() => Promise.resolve(mockPatchResult));
+
+      const updatedCar = await carController.update('1', { brand: 'Peugeot' });
+
+      expect(updatedCar.affected).toEqual(1);
+      expect(carService.update).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('POST /cars', () => {
     it('should create a car successfully', async () => {
       jest.spyOn(carService, 'create').mockImplementation(() =>

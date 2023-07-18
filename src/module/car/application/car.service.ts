@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { Car } from '../domain/car.entity';
 import { CreateCarDto } from '../interface/create-car.dto';
 
@@ -11,5 +11,9 @@ export class CarService {
   create(car: CreateCarDto): Promise<Car> {
     const newCar = this.carRepository.create(car);
     return this.carRepository.save(newCar);
+  }
+
+  update(id: number, fieldsToUpdate: Partial<CreateCarDto>): Promise<UpdateResult> {
+    return this.carRepository.update({ id }, fieldsToUpdate);
   }
 }
