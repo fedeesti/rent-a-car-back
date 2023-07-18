@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CarController } from '../car.controller';
-import { CarService } from '../../service/car.service';
+import { CarService } from '../../application/car.service';
 import { CarModule } from '../../car.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Car } from '../../entity/car.entity';
+import { Car } from '../../domain/car.entity';
 import { CreateCarDto } from '../create-car.dto';
 
 describe('CarController', () => {
