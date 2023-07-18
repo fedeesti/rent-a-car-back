@@ -20,4 +20,8 @@ export class CarService {
     const newCar = this.carRepository.create(car);
     return this.carRepository.save(newCar);
   }
+
+  findAll(): Promise<Car[]> {
+    return this.carRepository.find();
+  }
 }
