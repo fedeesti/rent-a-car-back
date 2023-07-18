@@ -5,6 +5,7 @@ import { CarModule } from '../../car.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Car } from '../../domain/car.entity';
 import { CreateCarDto } from '../create-car.dto';
+import { DeleteResult } from 'typeorm';
 
 describe('CarController', () => {
   let carController: CarController;
@@ -24,6 +25,21 @@ describe('CarController', () => {
 
   it('should be defined', () => {
     expect(carController).toBeDefined();
+  });
+
+  describe('DELETE /cars/:id', () => {
+    it('should return an object specifying a row has been deleted.', async () => {
+      jest
+        .spyOn(carService, 'delete')
+        .mockImplementation(() =>
+          Promise.resolve({ raw: [], affected: 1 } as unknown as Promise<DeleteResult>)
+        );
+
+      const deleteCar = await carController.delete('1');
+
+      expect(deleteCar.affected).toEqual(1);
+      expect(carService.delete).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('POST /cars', () => {
