@@ -4,7 +4,7 @@ import { CarService } from '../../application/car.service';
 import { CarModule } from '../../car.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Car } from '../../domain/car.entity';
-import { CreateCarDto } from '../create-car.dto';
+import { CreateCarDto } from '../car.dto';
 import { DeleteResult } from 'typeorm';
 
 describe('CarController', () => {
@@ -77,7 +77,7 @@ describe('CarController', () => {
         .spyOn(carService, 'findById')
         .mockImplementation(() => Promise.resolve(mockCar as unknown as Promise<Car>));
 
-      const car: Car = await carController.getUser('1');
+      const car: Car = await carController.getCar('1');
 
       expect(car).toEqual(mockCar);
       expect(carService.findById).toHaveBeenCalledTimes(1);
