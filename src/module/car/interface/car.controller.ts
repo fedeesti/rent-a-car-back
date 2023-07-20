@@ -1,8 +1,9 @@
-import { Body, Controller, Param, Post, Patch, Get, Delete } from '@nestjs/common';
+import { Body, Controller, Param, Post, Patch, Get, Delete, ParseIntPipe } from '@nestjs/common';
 import { CarService } from '../application/car.service';
-import { CreateCarDto } from './create-car.dto';
+import { CreateCarDto, UpdateCarDto } from './car.dto';
 import { Car } from '../domain/car.entity';
 import { DeleteResult, UpdateResult } from 'typeorm';
+import { ValidationPipe } from '../../../common/interface/validation.pipe';
 
 @Controller('cars')
 export class CarController {
@@ -14,25 +15,32 @@ export class CarController {
   }
 
   @Get(':id')
-  getUser(@Param('id') id: string): Promise<Car> {
-    return this.service.findById(Number(id));
+  getCar(
+    @Param('id', ParseIntPipe)
+    id: number
+  ): Promise<Car> {
+    if (!id) {
+      console.log(id);
+      console.log('incorrecto');
+    }
+    return this.service.findById(id);
   }
 
   @Post()
-  save(@Body() newCar: CreateCarDto): Promise<Car> {
+  save(@Body(new ValidationPipe()) newCar: CreateCarDto): Promise<Car> {
     return this.service.create(newCar);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
-    @Body() fieldsToUpdate: Partial<CreateCarDto>
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ValidationPipe()) fieldsToUpdate: UpdateCarDto
   ): Promise<UpdateResult> {
-    return this.service.update(Number(id), fieldsToUpdate);
+    return this.service.update(id, fieldsToUpdate);
   }
 
   @Delete()
-  delete(@Param('id') id: string): Promise<DeleteResult> {
-    return this.service.delete(Number(id));
+  delete(@Param('id', new ParseIntPipe()) id: number): Promise<DeleteResult> {
+    return this.service.delete(id);
   }
 }
