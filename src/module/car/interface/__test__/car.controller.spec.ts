@@ -77,7 +77,7 @@ describe('CarController', () => {
         .spyOn(carService, 'findById')
         .mockImplementation(() => Promise.resolve(mockCar as unknown as Promise<Car>));
 
-      const car: Car = await carController.getCar('1');
+      const car: Car = await carController.getCar(1);
 
       expect(car).toEqual(mockCar);
       expect(carService.findById).toHaveBeenCalledTimes(1);
@@ -94,7 +94,7 @@ describe('CarController', () => {
 
       jest.spyOn(carService, 'update').mockImplementation(() => Promise.resolve(mockPatchResult));
 
-      const updatedCar = await carController.update('1', { brand: 'Peugeot' });
+      const updatedCar = await carController.update(1, { brand: 'Peugeot' });
 
       expect(updatedCar.affected).toEqual(1);
       expect(carService.update).toHaveBeenCalledTimes(1);
@@ -158,7 +158,7 @@ describe('CarController', () => {
           Promise.resolve({ raw: [], affected: 1 } as unknown as Promise<DeleteResult>)
         );
 
-      const deleteCar = await carController.delete('1');
+      const deleteCar = await carController.delete(1);
 
       expect(deleteCar.affected).toEqual(1);
       expect(carService.delete).toHaveBeenCalledTimes(1);

@@ -19,6 +19,10 @@ export class CarController {
     @Param('id', ParseIntPipe)
     id: number
   ): Promise<Car> {
+    if (!id) {
+      console.log(id);
+      console.log('incorrecto');
+    }
     return this.service.findById(id);
   }
 

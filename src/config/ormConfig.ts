@@ -1,5 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { Car } from 'src/module/car/domain/car.entity';
+import { Car } from '../module/car/domain/car.entity';
 
 export const typeormConfig: TypeOrmModuleOptions = {
   type: 'sqlite',
