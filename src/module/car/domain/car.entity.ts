@@ -1,40 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-
-@Entity({ name: 'cars' })
-export class Car {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  brand: string;
-
-  @Column()
-  model: string;
-
-  @Column()
-  color: string;
-
-  @Column()
-  img: string;
-
-  @Column()
-  kms: number;
-
-  @Column()
-  passengers: number;
-
-  @Column()
-  price: number;
-
-  @Column()
-  year: number;
-
-  @Column()
-  transmission: string;
-
-  @Column()
-  airConditioner: boolean;
-
-  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+import { BaseEntity } from '../../../common/domain/base.entity';
+export class Car extends BaseEntity {
+  public brand: string;
+  public model: string;
+  public color: string;
+  public img: string;
+  public kms: number;
+  public passengers: number;
+  public price: number;
+  public year: number;
+  public transmission: string;
+  public airConditioner: boolean;
+  public deletedAt: Date;
 }

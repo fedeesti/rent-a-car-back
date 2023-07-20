@@ -4,11 +4,13 @@ import { INestApplication } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Car } from '../src/module/car/domain/car.entity';
 import { CarModule } from '../src/module/car/car.module';
+import { CarSchema } from '../src/module/car/infrastructure/car.schema';
+import { BaseSchema } from '../src/common/infrastructure/baseSchema';
 
 const testOrmConfig: TypeOrmModuleOptions = {
   type: 'sqlite',
   database: ':memory:',
-  entities: [Car],
+  entities: [BaseSchema, CarSchema],
   synchronize: true,
 };
 

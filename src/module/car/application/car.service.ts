@@ -21,7 +21,7 @@ export class CarService {
   }
 
   create(car: CreateCarDto): Promise<Car> {
-    const newCar = this.carRepository.create(car);
+    const newCar: Car = this.carRepository.create(car);
     return this.carRepository.save(newCar);
   }
 

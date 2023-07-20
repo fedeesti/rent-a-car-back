@@ -44,6 +44,8 @@ describe('CarService', () => {
           transmission: 'test',
           airConditioner: false,
           createdAt: new Date(),
+          updatedAt: new Date(),
+          deletedAt: new Date(),
         },
       ];
 
