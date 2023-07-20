@@ -29,7 +29,7 @@ describe('CarController', () => {
 
   describe('GET /users', () => {
     it('should return an array of cars', async () => {
-      const carArray = [
+      const carArray: Car[] = [
         {
           id: 1,
           brand: 'test',
@@ -42,7 +42,9 @@ describe('CarController', () => {
           year: 2016,
           transmission: 'manual',
           airConditioner: true,
-          createdAt: '2023-07-17T17:34:27.000Z',
+          deletedAt: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ];
       jest

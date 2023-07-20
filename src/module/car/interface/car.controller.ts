@@ -14,14 +14,17 @@ import { CreateCarDto, UpdateCarDto } from './car.dto';
 import { Car } from '../domain/car.entity';
 import { DeleteResult, UpdateResult } from 'typeorm';
 import { ValidationPipe } from '../../../common/interface/validation.pipe';
+import { mapRequestToEntity } from './car.mapper';
 
 @Controller('cars')
 export class CarController {
   constructor(private readonly service: CarService) {}
 
   @Get()
-  getCars(): Promise<Car[]> {
-    return this.service.findAll();
+  async getCars(): Promise<Car[]> {
+    const cars = await this.service.findAll();
+
+    return cars;
   }
 
   @Get(':id')
@@ -37,8 +40,8 @@ export class CarController {
   }
 
   @Post()
-  save(@Body(new ValidationPipe()) newCar: CreateCarDto): Promise<Car> {
-    return this.service.create(newCar);
+  save(@Body(new ValidationPipe()) carDto: CreateCarDto): Promise<Car> {
+    return this.service.create(mapRequestToEntity(carDto));
   }
 
   @Patch(':id')
