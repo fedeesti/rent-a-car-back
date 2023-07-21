@@ -4,8 +4,8 @@ import { CarService } from '../../application/car.service';
 import { CarModule } from '../../car.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Car } from '../../domain/car.entity';
-import { CreateCarDto } from '../car.dto';
-import { DeleteResult } from 'typeorm';
+import { CreateCarDto, UpdateCarDto } from '../car.dto';
+import { arrayOfCars, car } from './__mocks__/constants';
 
 describe('CarController', () => {
   let carController: CarController;
@@ -29,27 +29,9 @@ describe('CarController', () => {
 
   describe('GET /users', () => {
     it('should return an array of cars', async () => {
-      const carArray: Car[] = [
-        {
-          id: 1,
-          brand: 'test',
-          model: 'test',
-          color: 'test',
-          img: 'test.png',
-          kms: 1,
-          passengers: 1,
-          price: 1,
-          year: 2016,
-          transmission: 'manual',
-          airConditioner: true,
-          deletedAt: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
       jest
         .spyOn(carService, 'findAll')
-        .mockImplementation(() => Promise.resolve(carArray as unknown as Promise<Car[]>));
+        .mockImplementation(() => Promise.resolve(arrayOfCars as unknown as Promise<Car[]>));
 
       const result = await carController.getCars();
 
@@ -60,95 +42,42 @@ describe('CarController', () => {
 
   describe('GET /users/:id', () => {
     it('should return a car', async () => {
-      const mockCar = {
-        id: 1,
-        brand: 'test',
-        model: 'test',
-        color: 'test',
-        img: 'test.png',
-        kms: 80,
-        passengers: 1,
-        price: 1,
-        year: 2000,
-        transmission: 'manual',
-        airConditioner: true,
-        createdAt: new Date(),
-      };
-
       jest
         .spyOn(carService, 'findById')
-        .mockImplementation(() => Promise.resolve(mockCar as unknown as Promise<Car>));
+        .mockImplementation(() => Promise.resolve(car as unknown as Promise<Car>));
 
-      const car: Car = await carController.getCar(1);
+      const result: Car = await carController.getCar(1);
 
-      expect(car).toEqual(mockCar);
+      expect(result).toEqual(car);
       expect(carService.findById).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('PATCH /cars/:id', () => {
-    it('should return an object specifying a row has been updated', async () => {
-      const mockPatchResult = {
-        generatedMaps: [],
-        raw: [],
-        affected: 1,
-      };
-
-      jest.spyOn(carService, 'update').mockImplementation(() => Promise.resolve(mockPatchResult));
-
-      const updatedCar = await carController.update(1, { brand: 'Peugeot' });
-
-      expect(updatedCar.affected).toEqual(1);
-      expect(carService.update).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('POST /cars', () => {
     it('should create a car successfully', async () => {
-      const mockCar = {
-        id: 1,
-        brand: 'test',
-        model: 'test',
-        color: 'test',
-        img: 'test.png',
-        kms: 80,
-        passengers: 1,
-        price: 1,
-        year: 2000,
-        transmission: 'manual',
-        airConditioner: true,
-        createdAt: new Date(),
-      };
-
       jest
         .spyOn(carService, 'create')
-        .mockImplementation(() => Promise.resolve(mockCar as unknown as Promise<Car>));
+        .mockImplementation(() => Promise.resolve(car as unknown as Promise<Car>));
 
-      const carCreated = await carController.save({
-        brand: 'test',
-        model: 'test',
-        color: 'test',
-        img: 'test.png',
-        kms: 80,
-        passengers: 1,
-        price: 1,
-        year: 2000,
-        transmission: 'manual',
-        airConditioner: true,
-      } as unknown as CreateCarDto);
+      const carDto = new CreateCarDto();
+      const carCreated = await carController.save(carDto);
 
+      expect(carCreated).toEqual(car);
       expect(carService.create).toHaveBeenCalledTimes(1);
-      expect(carCreated.id).toEqual(1);
-      expect(carCreated.brand).toEqual('test');
-      expect(carCreated.model).toEqual('test');
-      expect(carCreated.color).toEqual('test');
-      expect(carCreated.img).toEqual('test.png');
-      expect(carCreated.kms).toEqual(80);
-      expect(carCreated.passengers).toEqual(1);
-      expect(carCreated.price).toEqual(1);
-      expect(carCreated.year).toEqual(2000);
-      expect(carCreated.transmission).toEqual('manual');
-      expect(carCreated.airConditioner).toEqual(true);
+      expect(carService.create).toHaveBeenCalledWith(carDto);
+    });
+  });
+
+  describe('PATCH /cars/:id', () => {
+    it('should return an object specifying a row has been updated', async () => {
+      jest.spyOn(carService, 'update').mockImplementation(() => Promise.resolve(car as Car));
+
+      const updatedCarDto = new UpdateCarDto();
+      const updatedCar = await carController.update(1, updatedCarDto);
+
+      expect(updatedCar).toEqual(car);
+      expect(carService.update).toHaveBeenCalledTimes(1);
+      expect(carService.update).toHaveBeenCalledWith(1, updatedCarDto);
     });
   });
 
@@ -156,13 +85,11 @@ describe('CarController', () => {
     it('should return an object specifying a row has been deleted.', async () => {
       jest
         .spyOn(carService, 'delete')
-        .mockImplementation(() =>
-          Promise.resolve({ raw: [], affected: 1 } as unknown as Promise<DeleteResult>)
-        );
+        .mockImplementation(() => Promise.resolve(car as unknown as Promise<Car>));
 
       const deleteCar = await carController.delete(1);
 
-      expect(deleteCar.affected).toEqual(1);
+      expect(deleteCar).toEqual(car);
       expect(carService.delete).toHaveBeenCalledTimes(1);
     });
   });

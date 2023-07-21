@@ -1,35 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Car } from '../domain/car.entity';
 import { CreateCarDto } from '../interface/car.dto';
 
+import { CarRepository } from '../infrastructure/car.repository';
 @Injectable()
 export class CarService {
-  constructor(@InjectRepository(Car) private carRepository: Repository<Car>) {}
+  constructor(private carRepository: CarRepository) {}
 
   findAll(): Promise<Car[]> {
     return this.carRepository.find();
   }
 
   findById(id: number): Promise<Car> {
-    return this.carRepository.findOne({
-      where: {
-        id,
-      },
-    });
+    return this.carRepository.findOne(id);
   }
 
-  create(car: CreateCarDto): Promise<Car> {
-    const newCar: Car = this.carRepository.create(car);
-    return this.carRepository.save(newCar);
+  async create(car: CreateCarDto): Promise<Car> {
+    return this.carRepository.create(car);
   }
 
-  update(id: number, fieldsToUpdate: Partial<CreateCarDto>): Promise<UpdateResult> {
-    return this.carRepository.update({ id }, fieldsToUpdate);
+  update(id: number, fieldsToUpdate: Partial<CreateCarDto>): Promise<Car> {
+    return this.carRepository.update(id, fieldsToUpdate);
   }
 
-  delete(id: number): Promise<DeleteResult> {
-    return this.carRepository.delete({ id });
+  delete(id: number): Promise<Car> {
+    return this.carRepository.delete(id);
   }
 }

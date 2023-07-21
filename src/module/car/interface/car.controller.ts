@@ -1,18 +1,7 @@
-import {
-  Body,
-  Controller,
-  Param,
-  Post,
-  Patch,
-  Get,
-  Delete,
-  ParseIntPipe,
-  NotFoundException,
-} from '@nestjs/common';
+import { Body, Controller, Param, Post, Patch, Get, Delete, ParseIntPipe } from '@nestjs/common';
 import { CarService } from '../application/car.service';
 import { CreateCarDto, UpdateCarDto } from './car.dto';
 import { Car } from '../domain/car.entity';
-import { DeleteResult, UpdateResult } from 'typeorm';
 import { ValidationPipe } from '../../../common/interface/validation.pipe';
 import { mapRequestToEntity } from './car.mapper';
 
@@ -28,15 +17,11 @@ export class CarController {
   }
 
   @Get(':id')
-  async getCar(
+  getCar(
     @Param('id', ParseIntPipe)
     id: number
   ): Promise<Car> {
-    const car: Car = await this.service.findById(id);
-
-    if (!car) throw new NotFoundException(`Car with id ${id} not found`);
-
-    return car;
+    return this.service.findById(id);
   }
 
   @Post()
@@ -45,15 +30,15 @@ export class CarController {
   }
 
   @Patch(':id')
-  async update(
+  update(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe()) fieldsToUpdate: UpdateCarDto
-  ): Promise<UpdateResult> {
-    return await this.service.update(id, fieldsToUpdate);
+  ): Promise<Car> {
+    return this.service.update(id, fieldsToUpdate);
   }
 
-  @Delete()
-  async delete(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
-    return await this.service.delete(id);
+  @Delete(':id')
+  delete(@Param('id', ParseIntPipe) id: number): Promise<Car> {
+    return this.service.delete(id);
   }
 }
