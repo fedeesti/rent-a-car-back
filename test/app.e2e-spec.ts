@@ -2,11 +2,16 @@ import request from 'supertest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { Car } from '../src/module/car/domain/car.entity';
 import { CarModule } from '../src/module/car/car.module';
 import { CarSchema } from '../src/module/car/infrastructure/car.schema';
 import { BaseSchema } from '../src/common/infrastructure/baseSchema';
-import { homedir } from 'os';
+import {
+  badRequestCarDtoValidation,
+  badRequestIdValidation,
+  invalidCarDtoData,
+  mockCarDto,
+} from '../test/__mocks__/constants';
+import { execPath } from 'process';
 
 const testOrmConfig: TypeOrmModuleOptions = {
   type: 'sqlite',
@@ -37,57 +42,47 @@ describe('Cars', () => {
   });
 
   describe('POST /cars', () => {
-    it('should return a message error of validation failed', async () => {
-      const invalidData = {
-        brand: '',
-        model: 207,
-        color: 'rojo',
-        img: 1,
-        kms: 'test',
-        passengers: 'test',
-        price: 'test',
-        year: 'test',
-        transmission: true,
-        airConditioner: 'undefined',
-      };
-      const { body } = await request(app.getHttpServer()).post('/cars').send(invalidData);
+    it('when sending an invalid car dto, should return a 404 status code and an error message', async () => {
+      const { body } = await request(app.getHttpServer())
+        .post('/cars')
+        .send(invalidCarDtoData)
+        .expect(400);
 
-      expect(body.message).toEqual('Validation failed');
-      expect(body.error).toEqual('Bad Request');
-      expect(body.statusCode).toEqual(400);
+      expect(body).toEqual(badRequestCarDtoValidation);
     });
     it('should create a team successfully', async () => {
-      const carDto = {
-        brand: 'Chevrolet',
-        model: 'Corsa',
-        color: 'Gris',
-        img: 'chevroletcorsa.png',
-        kms: 40000,
-        passengers: 5,
-        price: 8000,
-        year: 2010,
-        transmission: 'manual',
-        airConditioner: true,
-      };
+      const { body } = await request(app.getHttpServer())
+        .post('/cars')
+        .send(mockCarDto)
+        .expect(201);
 
-      const { body } = await request(app.getHttpServer()).post('/cars').send(carDto).expect(201);
-
-      console.log(body);
+      console.log('carDto', body);
     });
   });
 
   describe('GET /cars/:id', () => {
     it('should return a car', async () => {
-      const { statusCode, body } = await request(app.getHttpServer()).get('/cars/1');
+      const { statusCode, body } = await request(app.getHttpServer()).get('/cars/1').expect(200);
 
       expect(statusCode).toEqual(200);
-      expect(body.brand).toEqual('Chevrolet');
-      expect(body.model).toEqual('Corsa');
+      expect(body.id).toEqual(1);
+      expect(body.brand).toEqual('test1');
+    });
+    it('when typing an invalid id, should return a 404 status code and an error message', async () => {
+      const arraywithInvalidId = ['1,5', '0,4', ',2', 'a_c', 'a-c', '-1', '1-', 'a*c', 'a+c'];
+
+      for (let i = 0; i < arraywithInvalidId.length; i++) {
+        const { body } = await request(app.getHttpServer())
+          .get(`/cars/${arraywithInvalidId[0]}`)
+          .expect(400);
+
+        expect(body).toEqual(badRequestIdValidation);
+      }
     });
   });
 
   describe('PATCH /cars/:id', () => {
-    it('should return a message error of validation failed', async () => {
+    it('when sending invalid fields, should return a 404 status code and an error message', async () => {
       const invalidData = [
         { brand: 'P' },
         { model: 207 },
@@ -104,9 +99,7 @@ describe('Cars', () => {
       for (let i = 0; i < invalidData.length; i++) {
         const { body } = await request(app.getHttpServer()).patch('/cars/1').send(invalidData[i]);
 
-        expect(body.message).toEqual('Validation failed');
-        expect(body.error).toEqual('Bad Request');
-        expect(body.statusCode).toEqual(400);
+        expect(body).toEqual(badRequestCarDtoValidation);
       }
     });
   });

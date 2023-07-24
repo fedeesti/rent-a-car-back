@@ -4,7 +4,7 @@ import { IsBoolean, IsNotEmpty, IsNumber, IsString, MinLength } from 'class-vali
 export class CreateCarDto {
   @IsString()
   @IsNotEmpty()
-  @MinLength(5)
+  @MinLength(5, { message: 'Brand is too short' })
   brand: string;
 
   @IsString()
