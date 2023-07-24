@@ -5,7 +5,7 @@ import { CarModule } from '../../car.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Car } from '../../domain/car.entity';
 import { CreateCarDto, UpdateCarDto } from '../car.dto';
-import { mockArrayOfCars, mockCar } from '../../../../../test/__mocks__/constants';
+import { mockArrayOfCars, mockCar } from '../../../../../test/utils/constants';
 
 describe('CarController', () => {
   let carController: CarController;

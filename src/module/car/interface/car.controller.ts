@@ -60,10 +60,4 @@ export class CarController {
   delete(@Param('id', ParseIntPipe) id: number): Promise<Car> {
     return this.service.delete(id);
   }
-
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile(validateFile) file: Express.Multer.File) {
-    console.log(file);
-  }
 }

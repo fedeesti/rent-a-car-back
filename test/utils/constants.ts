@@ -67,7 +67,13 @@ export const badRequestCarDtoValidation = {
   statusCode: 400,
 };
 
-export const invalidCarDtoData = {
+export const errorFileIsRequired = {
+  message: 'File is required',
+  error: 'Unprocessable Entity',
+  statusCode: 422,
+};
+
+export const mockInvalidCarDto = {
   brand: '',
   model: 207,
   color: true,

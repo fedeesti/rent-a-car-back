@@ -8,10 +8,10 @@ import { BaseSchema } from '../src/common/infrastructure/baseSchema';
 import {
   badRequestCarDtoValidation,
   badRequestIdValidation,
-  invalidCarDtoData,
+  errorFileIsRequired,
+  mockInvalidCarDto,
   mockCarDto,
-} from '../test/__mocks__/constants';
-import { execPath } from 'process';
+} from './utils/constants';
 
 const testOrmConfig: TypeOrmModuleOptions = {
   type: 'sqlite',
@@ -42,21 +42,66 @@ describe('Cars', () => {
   });
 
   describe('POST /cars', () => {
-    it('when sending an invalid car dto, should return a 404 status code and an error message', async () => {
-      const { body } = await request(app.getHttpServer())
-        .post('/cars')
-        .send(invalidCarDtoData)
-        .expect(400);
-
-      expect(body).toEqual(badRequestCarDtoValidation);
-    });
     it('should create a team successfully', async () => {
       const { body } = await request(app.getHttpServer())
         .post('/cars')
-        .send(mockCarDto)
+        .field('brand', mockCarDto.brand)
+        .field('model', mockCarDto.model)
+        .field('color', mockCarDto.color)
+        .field('img', mockCarDto.img)
+        .field('kms', mockCarDto.kms)
+        .field('passengers', mockCarDto.passengers)
+        .field('price', mockCarDto.price)
+        .field('year', mockCarDto.year)
+        .field('transmission', mockCarDto.transmission)
+        .field('airConditioner', mockCarDto.airConditioner)
+        .attach('file', 'test/utils/img.jpg')
         .expect(201);
+    });
 
-      console.log('carDto', body);
+    it('when not uploading a file, should return a 422 status code with an error message', async () => {
+      const { body } = await request(app.getHttpServer()).post('/cars').send(mockInvalidCarDto);
+
+      expect(body).toEqual(errorFileIsRequired);
+    });
+
+    it('when sending an invalid car dto with a valid image, should return a 404 status code and an error message', async () => {
+      const { body } = await request(app.getHttpServer())
+        .post('/cars')
+        .field('brand', mockInvalidCarDto.brand)
+        .field('model', mockInvalidCarDto.model)
+        .field('color', mockInvalidCarDto.color)
+        .field('img', mockInvalidCarDto.img)
+        .field('kms', mockInvalidCarDto.kms)
+        .field('passengers', mockInvalidCarDto.passengers)
+        .field('price', mockInvalidCarDto.price)
+        .field('year', mockInvalidCarDto.year)
+        .field('transmission', mockInvalidCarDto.transmission)
+        .field('airConditioner', mockInvalidCarDto.airConditioner)
+        .attach('file', 'test/utils/img.jpg')
+        .expect(400);
+
+      expect(body.error).toEqual('Bad Request');
+    });
+
+    it('when sending an invalid image with a valid car dto, should return a 422 status code and an error message', async () => {
+      const { body } = await request(app.getHttpServer())
+        .post('/cars')
+        .field('brand', mockCarDto.brand)
+        .field('model', mockCarDto.model)
+        .field('color', mockCarDto.color)
+        .field('img', mockCarDto.img)
+        .field('kms', mockCarDto.kms)
+        .field('passengers', mockCarDto.passengers)
+        .field('price', mockCarDto.price)
+        .field('year', mockCarDto.year)
+        .field('transmission', mockCarDto.transmission)
+        .field('airConditioner', mockCarDto.airConditioner)
+        .attach('file', 'test/utils/text.txt')
+        .expect(422);
+
+      expect(body.error).toEqual('Unprocessable Entity');
+      expect(body.message).toEqual('Validation failed (expected type is /(jpg|jpeg|png|svg)$/)');
     });
   });
 
@@ -68,6 +113,7 @@ describe('Cars', () => {
       expect(body.id).toEqual(1);
       expect(body.brand).toEqual('test1');
     });
+
     it('when typing an invalid id, should return a 404 status code and an error message', async () => {
       const arraywithInvalidId = ['1,5', '0,4', ',2', 'a_c', 'a-c', '-1', '1-', 'a*c', 'a+c'];
 
@@ -97,9 +143,12 @@ describe('Cars', () => {
       ];
 
       for (let i = 0; i < invalidData.length; i++) {
-        const { body } = await request(app.getHttpServer()).patch('/cars/1').send(invalidData[i]);
+        const { body } = await request(app.getHttpServer())
+          .patch('/cars/1')
+          .send(invalidData[i])
+          .expect(400);
 
-        expect(body).toEqual(badRequestCarDtoValidation);
+        expect(body.error).toEqual('Bad Request');
       }
     });
   });
