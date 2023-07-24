@@ -1,9 +1,22 @@
-import { Body, Controller, Param, Post, Patch, Get, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  Post,
+  Patch,
+  Get,
+  Delete,
+  ParseIntPipe,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CarService } from '../application/car.service';
 import { CreateCarDto, UpdateCarDto } from './car.dto';
 import { Car } from '../domain/car.entity';
 import { ValidationPipe } from '../../../common/interface/validation.pipe';
 import { mapRequestToEntity } from './car.mapper';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { validateFile } from '../../../common/interface/upload-img.validate';
 
 @Controller('cars')
 export class CarController {
@@ -25,8 +38,14 @@ export class CarController {
   }
 
   @Post()
-  save(@Body(new ValidationPipe()) carDto: CreateCarDto): Promise<Car> {
-    return this.service.create(mapRequestToEntity(carDto));
+  @UseInterceptors(FileInterceptor('file'))
+  save(
+    @UploadedFile(validateFile) file: Express.Multer.File,
+    @Body(new ValidationPipe()) carDto: CreateCarDto
+  ) {
+    console.log(carDto);
+    console.log(file);
+    // return this.service.create(mapRequestToEntity(carDto));
   }
 
   @Patch(':id')
@@ -40,5 +59,11 @@ export class CarController {
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number): Promise<Car> {
     return this.service.delete(id);
+  }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(@UploadedFile(validateFile) file: Express.Multer.File) {
+    console.log(file);
   }
 }
