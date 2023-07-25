@@ -39,7 +39,7 @@ export class CarController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('img', multerOptions))
+  @UseInterceptors(FileInterceptor('file', multerOptions))
   save(
     @UploadedFile(new ParseFilePipe({ fileIsRequired: true })) file: Express.Multer.File,
     @Body(new ValidationPipe()) carDto: CreateCarDto
@@ -63,11 +63,5 @@ export class CarController {
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number): Promise<Car> {
     return this.service.delete(id);
-  }
-
-  @Post('img')
-  @UseInterceptors(FileInterceptor('img'))
-  upload(@UploadedFile(new ParseFilePipe({ fileIsRequired: true })) file: Express.Multer.File) {
-    console.log(file);
   }
 }

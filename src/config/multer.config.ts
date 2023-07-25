@@ -1,5 +1,7 @@
-import { extname, join } from 'path';
+import { config } from 'dotenv';
+import { extname } from 'path';
 import { diskStorage } from 'multer';
+config();
 import { BadRequestException } from '@nestjs/common';
 
 export const multerOptions = {
