@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   UploadedFile,
   UseInterceptors,
+  ParseFilePipe,
 } from '@nestjs/common';
 import { CarService } from '../application/car.service';
 import { CreateCarDto, UpdateCarDto } from './car.dto';
@@ -16,7 +17,7 @@ import { Car } from '../domain/car.entity';
 import { ValidationPipe } from '../../../common/interface/validation.pipe';
 import { mapRequestToEntity } from './car.mapper';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { validateFile } from '../../../common/interface/upload-img.validate';
+import { multerOptions } from '../../../config/multer.config';
 
 @Controller('cars')
 export class CarController {
@@ -38,19 +39,22 @@ export class CarController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('img', multerOptions))
   save(
-    @UploadedFile(validateFile) file: Express.Multer.File,
+    @UploadedFile(new ParseFilePipe({ fileIsRequired: true })) file: Express.Multer.File,
     @Body(new ValidationPipe()) carDto: CreateCarDto
   ) {
-    console.log(carDto);
-    console.log(file);
-    // return this.service.create(mapRequestToEntity(carDto));
+    const path = file.path.split('uploads\\')[1];
+    const car: Car = mapRequestToEntity(carDto, path);
+
+    return this.service.create(car);
   }
 
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('img', multerOptions))
   update(
     @Param('id', ParseIntPipe) id: number,
+    @UploadedFile(new ParseFilePipe({ fileIsRequired: false })) file: Express.Multer.File,
     @Body(new ValidationPipe()) fieldsToUpdate: UpdateCarDto
   ): Promise<Car> {
     return this.service.update(id, fieldsToUpdate);
@@ -59,5 +63,11 @@ export class CarController {
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number): Promise<Car> {
     return this.service.delete(id);
+  }
+
+  @Post('img')
+  @UseInterceptors(FileInterceptor('img'))
+  upload(@UploadedFile(new ParseFilePipe({ fileIsRequired: true })) file: Express.Multer.File) {
+    console.log(file);
   }
 }
