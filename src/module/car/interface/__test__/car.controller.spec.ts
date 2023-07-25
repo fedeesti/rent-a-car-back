@@ -5,7 +5,7 @@ import { CarModule } from '../../car.module';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Car } from '../../domain/car.entity';
 import { CreateCarDto, UpdateCarDto } from '../car.dto';
-import { mockArrayOfCars, mockCar } from '../../../../../test/utils/constants';
+import { mockArrayOfCars, mockCar, mockFile } from '../../../../../test/utils/constants';
 
 describe('CarController', () => {
   let carController: CarController;
@@ -60,7 +60,7 @@ describe('CarController', () => {
         .mockImplementation(() => Promise.resolve(mockCar as unknown as Promise<Car>));
 
       const carDto = new CreateCarDto();
-      const carCreated = await carController.save(carDto);
+      const carCreated = await carController.save(mockFile, carDto);
 
       expect(carCreated).toEqual(mockCar);
       expect(carService.create).toHaveBeenCalledTimes(1);
@@ -73,7 +73,7 @@ describe('CarController', () => {
       jest.spyOn(carService, 'update').mockImplementation(() => Promise.resolve(mockCar as Car));
 
       const updatedCarDto = new UpdateCarDto();
-      const updatedCar = await carController.update(1, updatedCarDto);
+      const updatedCar = await carController.update(1, mockFile, updatedCarDto);
 
       expect(updatedCar).toEqual(mockCar);
       expect(carService.update).toHaveBeenCalledTimes(1);

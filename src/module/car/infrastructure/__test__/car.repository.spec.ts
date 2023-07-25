@@ -63,17 +63,13 @@ describe('CarRepository', () => {
 
   describe('Create a car and save it in the database', () => {
     it('should return a created car', async () => {
-      jest.spyOn(repository, 'create').mockImplementation(jest.fn(() => mockCar));
       jest
         .spyOn(repository, 'save')
         .mockImplementation(() => Promise.resolve(mockCar as unknown as Promise<Car>));
 
-      const carCreateDto = new CreateCarDto();
-      const createdCar = await carRepository.create(carCreateDto);
+      const createdCar = await carRepository.create(mockCar);
 
       expect(createdCar).toEqual(mockCar);
-      expect(repository.create).toHaveBeenCalledTimes(1);
-      expect(repository.create).toHaveBeenCalledWith(carCreateDto);
       expect(repository.save).toHaveBeenCalledTimes(1);
       expect(repository.save).toHaveBeenCalledWith(mockCar);
     });
