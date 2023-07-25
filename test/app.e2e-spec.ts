@@ -1,24 +1,15 @@
 import request from 'supertest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { CarModule } from '../src/module/car/car.module';
-import { CarSchema } from '../src/module/car/infrastructure/car.schema';
-import { BaseSchema } from '../src/common/infrastructure/baseSchema';
 import {
-  badRequestCarDtoValidation,
+  testOrmConfig,
   badRequestIdValidation,
   errorFileIsRequired,
   mockInvalidCarDto,
   mockCarDto,
 } from './utils/constants';
-
-const testOrmConfig: TypeOrmModuleOptions = {
-  type: 'sqlite',
-  database: ':memory:',
-  entities: [BaseSchema, CarSchema],
-  synchronize: true,
-};
 
 describe('Cars', () => {
   let app: INestApplication;
@@ -43,19 +34,10 @@ describe('Cars', () => {
 
   describe('POST /cars', () => {
     it('should create a team successfully', async () => {
-      const { body } = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/cars')
-        .field('brand', mockCarDto.brand)
-        .field('model', mockCarDto.model)
-        .field('color', mockCarDto.color)
-        .field('img', mockCarDto.img)
-        .field('kms', mockCarDto.kms)
-        .field('passengers', mockCarDto.passengers)
-        .field('price', mockCarDto.price)
-        .field('year', mockCarDto.year)
-        .field('transmission', mockCarDto.transmission)
-        .field('airConditioner', mockCarDto.airConditioner)
-        .attach('file', 'test/utils/img.jpg')
+        .attach('file', Buffer.alloc(1024, 'fake'), 'test.jpg')
+        .field(mockCarDto)
         .expect(201);
     });
 
@@ -68,17 +50,8 @@ describe('Cars', () => {
     it('when sending an invalid car dto with a valid image, should return a 404 status code and an error message', async () => {
       const { body } = await request(app.getHttpServer())
         .post('/cars')
-        .field('brand', mockInvalidCarDto.brand)
-        .field('model', mockInvalidCarDto.model)
-        .field('color', mockInvalidCarDto.color)
-        .field('img', mockInvalidCarDto.img)
-        .field('kms', mockInvalidCarDto.kms)
-        .field('passengers', mockInvalidCarDto.passengers)
-        .field('price', mockInvalidCarDto.price)
-        .field('year', mockInvalidCarDto.year)
-        .field('transmission', mockInvalidCarDto.transmission)
-        .field('airConditioner', mockInvalidCarDto.airConditioner)
-        .attach('file', 'test/utils/img.jpg')
+        .attach('file', Buffer.alloc(1024, 'fake'), 'test.jpg')
+        .field(mockInvalidCarDto)
         .expect(400);
 
       expect(body.error).toEqual('Bad Request');
@@ -87,21 +60,12 @@ describe('Cars', () => {
     it('when sending an invalid image with a valid car dto, should return a 422 status code and an error message', async () => {
       const { body } = await request(app.getHttpServer())
         .post('/cars')
-        .field('brand', mockCarDto.brand)
-        .field('model', mockCarDto.model)
-        .field('color', mockCarDto.color)
-        .field('img', mockCarDto.img)
-        .field('kms', mockCarDto.kms)
-        .field('passengers', mockCarDto.passengers)
-        .field('price', mockCarDto.price)
-        .field('year', mockCarDto.year)
-        .field('transmission', mockCarDto.transmission)
-        .field('airConditioner', mockCarDto.airConditioner)
-        .attach('file', 'test/utils/text.txt')
-        .expect(422);
+        .attach('file', Buffer.alloc(1024, 'fake'), 'test.txt')
+        .field(mockCarDto)
+        .expect(400);
 
-      expect(body.error).toEqual('Unprocessable Entity');
-      expect(body.message).toEqual('Validation failed (expected type is /(jpg|jpeg|png|svg)$/)');
+      expect(body.error).toEqual('Bad Request');
+      expect(body.message).toEqual('Unsupported file type .txt');
     });
   });
 
@@ -145,7 +109,8 @@ describe('Cars', () => {
       for (let i = 0; i < invalidData.length; i++) {
         const { body } = await request(app.getHttpServer())
           .patch('/cars/1')
-          .send(invalidData[i])
+          .attach('file', Buffer.alloc(1024, 'fake'), 'test.jpg')
+          .field(invalidData[i])
           .expect(400);
 
         expect(body.error).toEqual('Bad Request');
