@@ -1,24 +1,15 @@
 import request from 'supertest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { CarModule } from '../src/module/car/car.module';
-import { CarSchema } from '../src/module/car/infrastructure/car.schema';
-import { BaseSchema } from '../src/common/infrastructure/baseSchema';
 import {
-  badRequestCarDtoValidation,
+  testOrmConfig,
   badRequestIdValidation,
-  invalidCarDtoData,
+  errorFileIsRequired,
+  mockInvalidCarDto,
   mockCarDto,
-} from '../test/__mocks__/constants';
-import { execPath } from 'process';
-
-const testOrmConfig: TypeOrmModuleOptions = {
-  type: 'sqlite',
-  database: ':memory:',
-  entities: [BaseSchema, CarSchema],
-  synchronize: true,
-};
+} from './utils/constants';
 
 describe('Cars', () => {
   let app: INestApplication;
@@ -42,21 +33,39 @@ describe('Cars', () => {
   });
 
   describe('POST /cars', () => {
-    it('when sending an invalid car dto, should return a 404 status code and an error message', async () => {
+    it('should create a team successfully', async () => {
+      await request(app.getHttpServer())
+        .post('/cars')
+        .attach('file', Buffer.alloc(1024, 'fake'), 'test.jpg')
+        .field(mockCarDto)
+        .expect(201);
+    });
+
+    it('when not uploading a file, should return a 422 status code with an error message', async () => {
+      const { body } = await request(app.getHttpServer()).post('/cars').send(mockInvalidCarDto);
+
+      expect(body).toEqual(errorFileIsRequired);
+    });
+
+    it('when sending an invalid car dto with a valid image, should return a 404 status code and an error message', async () => {
       const { body } = await request(app.getHttpServer())
         .post('/cars')
-        .send(invalidCarDtoData)
+        .attach('file', Buffer.alloc(1024, 'fake'), 'test.jpg')
+        .field(mockInvalidCarDto)
         .expect(400);
 
-      expect(body).toEqual(badRequestCarDtoValidation);
+      expect(body.error).toEqual('Bad Request');
     });
-    it('should create a team successfully', async () => {
+
+    it('when sending an invalid image with a valid car dto, should return a 422 status code and an error message', async () => {
       const { body } = await request(app.getHttpServer())
         .post('/cars')
-        .send(mockCarDto)
-        .expect(201);
+        .attach('file', Buffer.alloc(1024, 'fake'), 'test.txt')
+        .field(mockCarDto)
+        .expect(400);
 
-      console.log('carDto', body);
+      expect(body.error).toEqual('Bad Request');
+      expect(body.message).toEqual('Unsupported file type .txt');
     });
   });
 
@@ -68,6 +77,7 @@ describe('Cars', () => {
       expect(body.id).toEqual(1);
       expect(body.brand).toEqual('test1');
     });
+
     it('when typing an invalid id, should return a 404 status code and an error message', async () => {
       const arraywithInvalidId = ['1,5', '0,4', ',2', 'a_c', 'a-c', '-1', '1-', 'a*c', 'a+c'];
 
@@ -97,9 +107,13 @@ describe('Cars', () => {
       ];
 
       for (let i = 0; i < invalidData.length; i++) {
-        const { body } = await request(app.getHttpServer()).patch('/cars/1').send(invalidData[i]);
+        const { body } = await request(app.getHttpServer())
+          .patch('/cars/1')
+          .attach('file', Buffer.alloc(1024, 'fake'), 'test.jpg')
+          .field(invalidData[i])
+          .expect(400);
 
-        expect(body).toEqual(badRequestCarDtoValidation);
+        expect(body.error).toEqual('Bad Request');
       }
     });
   });

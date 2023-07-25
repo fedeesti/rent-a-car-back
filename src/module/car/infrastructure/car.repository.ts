@@ -29,8 +29,7 @@ export class CarRepository {
     return car;
   }
 
-  async create(body: CreateCarDto): Promise<Car> {
-    const car = this.repository.create(body);
+  async create(car: Car): Promise<Car> {
     await this.repository.save(car);
     return car;
   }

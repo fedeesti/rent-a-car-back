@@ -15,7 +15,7 @@ export class CarService {
     return this.carRepository.findOne(id);
   }
 
-  async create(car: CreateCarDto): Promise<Car> {
+  async create(car: Car): Promise<Car> {
     return this.carRepository.create(car);
   }
 

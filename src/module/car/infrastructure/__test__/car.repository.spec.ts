@@ -3,7 +3,7 @@ import { CarRepository } from '../car.repository';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Car } from '../../domain/car.entity';
 import { Repository } from 'typeorm';
-import { mockArrayOfCars, mockCar } from '../../../../../test/__mocks__/constants';
+import { mockArrayOfCars, mockCar } from '../../../../../test/utils/constants';
 import { CreateCarDto, UpdateCarDto } from '../../interface/car.dto';
 
 describe('CarRepository', () => {
@@ -63,17 +63,13 @@ describe('CarRepository', () => {
 
   describe('Create a car and save it in the database', () => {
     it('should return a created car', async () => {
-      jest.spyOn(repository, 'create').mockImplementation(jest.fn(() => mockCar));
       jest
         .spyOn(repository, 'save')
         .mockImplementation(() => Promise.resolve(mockCar as unknown as Promise<Car>));
 
-      const carCreateDto = new CreateCarDto();
-      const createdCar = await carRepository.create(carCreateDto);
+      const createdCar = await carRepository.create(mockCar);
 
       expect(createdCar).toEqual(mockCar);
-      expect(repository.create).toHaveBeenCalledTimes(1);
-      expect(repository.create).toHaveBeenCalledWith(carCreateDto);
       expect(repository.save).toHaveBeenCalledTimes(1);
       expect(repository.save).toHaveBeenCalledWith(mockCar);
     });

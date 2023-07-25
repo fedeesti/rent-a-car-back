@@ -4,7 +4,7 @@ import { Car } from '../../domain/car.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateCarDto, UpdateCarDto } from '../../interface/car.dto';
-import { mockArrayOfCars, mockCar } from '../../../../../test/__mocks__/constants';
+import { mockArrayOfCars, mockCar } from '../../../../../test/utils/constants';
 import { CarRepository } from '../../infrastructure/car.repository';
 
 describe('CarService', () => {
@@ -66,11 +66,10 @@ describe('CarService', () => {
         .spyOn(carRepository, 'create')
         .mockImplementation(() => Promise.resolve(mockCar as unknown as Promise<Car>));
 
-      const createCarDto = new CreateCarDto();
-      const createCar = await carService.create(createCarDto);
+      const createCar = await carService.create(mockCar);
 
       expect(createCar).toEqual(mockCar);
-      expect(carRepository.create).toHaveBeenCalledWith(createCarDto);
+      expect(carRepository.create).toHaveBeenCalledWith(mockCar);
       expect(carRepository.create).toHaveBeenCalledTimes(1);
     });
   });
