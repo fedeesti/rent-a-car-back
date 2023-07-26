@@ -3,11 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Car } from '../domain/car.entity';
 import { CreateCarDto } from '../interface/car.dto';
+import { CarSchema } from './car.schema';
+import { ICarRepository } from '../application/car.repository.interface';
 
 @Injectable()
-export class CarRepository {
+export class CarRepository implements ICarRepository {
   constructor(
-    @InjectRepository(Car)
+    @InjectRepository(CarSchema)
     private readonly repository: Repository<Car>
   ) {}
 
