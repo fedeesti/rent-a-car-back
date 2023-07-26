@@ -2,7 +2,7 @@ import request from 'supertest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CarModule } from '../src/module/car/car.module';
+import { CarModule } from '../module/car/car.module';
 import {
   testOrmConfig,
   badRequestIdValidation,

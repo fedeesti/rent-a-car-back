@@ -1,7 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { BaseSchema } from '../../src/common/infrastructure/baseSchema';
+import { BaseSchema } from '../../common/infrastructure/baseSchema';
 import { Car } from 'src/module/car/domain/car.entity';
-import { CarSchema } from '../../src/module/car/infrastructure/car.schema';
+import { CarSchema } from '../../module/car/infrastructure/car.schema';
 
 export const testOrmConfig: TypeOrmModuleOptions = {
   type: 'sqlite',

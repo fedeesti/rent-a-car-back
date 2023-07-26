@@ -4,7 +4,7 @@ import { Car } from '../../domain/car.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateCarDto, UpdateCarDto } from '../../interface/car.dto';
-import { mockArrayOfCars, mockCar } from '../../../../../test/utils/constants';
+import { mockArrayOfCars, mockCar } from '../../../../__test__/utils/constants';
 import { CarRepository } from '../../infrastructure/car.repository';
 
 describe('CarService', () => {
