@@ -14,9 +14,6 @@ export class CreateCarDto {
   @IsString()
   color: string;
 
-  @IsString()
-  img: string;
-
   @IsNumber()
   @Type(() => Number)
   kms: number;
