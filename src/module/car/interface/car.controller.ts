@@ -25,7 +25,7 @@ export class CarController {
 
   @Get()
   async getCars(): Promise<Car[]> {
-    const cars = await this.service.findAll();
+    const cars: Car[] = await this.service.findAll();
 
     return cars;
   }
@@ -39,7 +39,7 @@ export class CarController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('file', multerOptions))
+  @UseInterceptors(FileInterceptor('img', multerOptions))
   save(
     @UploadedFile(new ParseFilePipe({ fileIsRequired: true })) file: Express.Multer.File,
     @Body(new ValidationPipe()) carDto: CreateCarDto
