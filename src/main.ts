@@ -8,15 +8,3 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap();
-
-/*
-      TICKET
-Corregir POST /cars
-  - CreateCarDto debe recibir un img:File -> mapearlo a img:string -> pasarlo al servicio
-  - Mejorar las validaciones y testearlas
-
-      TICKET
-Corregir PATCH /cars/:id
-  - UpdateCarDto debe recibir un img:File -> mapearlo a img:string -> pasarlo al servicio
-  - Testear la funcionalidad
-*/

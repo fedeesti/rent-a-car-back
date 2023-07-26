@@ -7,12 +7,19 @@ import { CarRepository } from '../infrastructure/car.repository';
 export class CarService {
   constructor(private carRepository: CarRepository) {}
 
-  findAll(): Promise<Car[]> {
-    return this.carRepository.find();
+  async findAll(): Promise<Car[]> {
+    const cars = await this.carRepository.find();
+    console.log('CarService');
+    cars[0] instanceof Car
+      ? console.log('Es una entidad Car')
+      : console.log('No es una entidad Car');
+
+    return cars;
   }
 
-  findById(id: number): Promise<Car> {
-    return this.carRepository.findOne(id);
+  async findById(id: number): Promise<Car> {
+    const car = await this.carRepository.findOne(id);
+    return car;
   }
 
   async create(car: Car): Promise<Car> {

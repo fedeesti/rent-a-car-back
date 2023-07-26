@@ -3,7 +3,7 @@ import { CarRepository } from '../car.repository';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Car } from '../../domain/car.entity';
 import { Repository } from 'typeorm';
-import { mockArrayOfCars, mockCar } from '../../../../../test/utils/constants';
+import { mockArrayOfCars, mockCar } from '../../../../__test__/utils/constants';
 import { CreateCarDto, UpdateCarDto } from '../../interface/car.dto';
 
 describe('CarRepository', () => {
