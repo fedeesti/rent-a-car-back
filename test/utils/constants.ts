@@ -50,7 +50,6 @@ export const mockCarDto = {
   brand: 'test1',
   model: 'test',
   color: 'test',
-  img: 'test',
   kms: 1,
   passengers: 1,
   price: 1,
@@ -58,6 +57,8 @@ export const mockCarDto = {
   transmission: 'test',
   airConditioner: true,
 };
+
+export const arraywithInvalidId = ['1,5', '0,4', ',2', 'a_c', 'a-c', '-1', '1-', 'a*c', 'a+c'];
 
 export const mockFile: Express.Multer.File = {
   fieldname: 'img',
@@ -73,7 +74,7 @@ export const mockFile: Express.Multer.File = {
 };
 
 export const notFoundException = {
-  message: 'Car with id 12 not found',
+  message: `Car with id 2 not found`,
   error: 'Not Found',
   statusCode: 404,
 };
@@ -100,7 +101,6 @@ export const mockInvalidCarDto = {
   brand: '',
   model: 207,
   color: true,
-  img: 1,
   kms: 'test',
   passengers: 'test',
   price: 'test',

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Car } from '../domain/car.entity';
-import { CreateCarDto } from '../interface/car.dto';
+import { UpdateCarDto } from '../interface/car.dto';
 
 import { CarRepository } from '../infrastructure/car.repository';
 @Injectable()
@@ -19,7 +19,7 @@ export class CarService {
     return this.carRepository.create(car);
   }
 
-  update(id: number, fieldsToUpdate: Partial<CreateCarDto>): Promise<Car> {
+  update(id: number, fieldsToUpdate: UpdateCarDto): Promise<Car> {
     return this.carRepository.update(id, fieldsToUpdate);
   }
 
