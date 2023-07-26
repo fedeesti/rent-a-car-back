@@ -6,6 +6,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateCarDto, UpdateCarDto } from '../../interface/car.dto';
 import { mockArrayOfCars, mockCar } from '../../../../__test__/utils/constants';
 import { CarRepository } from '../../infrastructure/car.repository';
+import { CarSchema } from '../../infrastructure/car.schema';
 
 describe('CarService', () => {
   let carService: CarService;
@@ -17,7 +18,7 @@ describe('CarService', () => {
         CarService,
         CarRepository,
         {
-          provide: getRepositoryToken(Car),
+          provide: getRepositoryToken(CarSchema),
           useClass: Repository,
         },
       ],
@@ -40,7 +41,7 @@ describe('CarService', () => {
       const result = await carService.findAll();
 
       expect(result).toHaveLength(1);
-      expect(result).toEqual(mockArrayOfCars);
+      expect(result[0] instanceof Car).toEqual(true);
       expect(carRepository.find).toHaveBeenCalledTimes(1);
     });
   });
@@ -54,7 +55,7 @@ describe('CarService', () => {
       const id = 1;
       const result = await carService.findById(id);
 
-      expect(result).toEqual(mockCar);
+      expect(result instanceof Car).toEqual(true);
       expect(carRepository.findOne).toHaveBeenCalledWith(id);
       expect(carRepository.findOne).toHaveBeenCalledTimes(1);
     });

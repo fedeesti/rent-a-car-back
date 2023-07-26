@@ -26,16 +26,16 @@ export class CarController {
   @Get()
   async getCars(): Promise<Car[]> {
     const cars: Car[] = await this.service.findAll();
-
     return cars;
   }
 
   @Get(':id')
-  getCar(
+  async getCar(
     @Param('id', ParseIntPipe)
     id: number
   ): Promise<Car> {
-    return this.service.findById(id);
+    const car = await this.service.findById(id);
+    return car;
   }
 
   @Post()

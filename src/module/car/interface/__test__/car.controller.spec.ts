@@ -6,6 +6,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Car } from '../../domain/car.entity';
 import { CreateCarDto, UpdateCarDto } from '../car.dto';
 import { mockArrayOfCars, mockCar, mockFile } from '../../../../__test__/utils/constants';
+import { CarSchema } from '../../infrastructure/car.schema';
 
 describe('CarController', () => {
   let carController: CarController;
@@ -15,7 +16,7 @@ describe('CarController', () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [CarModule],
     })
-      .overrideProvider(getRepositoryToken(Car))
+      .overrideProvider(getRepositoryToken(CarSchema))
       .useValue(jest.fn())
       .compile();
 
@@ -36,6 +37,7 @@ describe('CarController', () => {
       const result = await carController.getCars();
 
       expect(result).toHaveLength(1);
+      expect(result[0] instanceof Car).toEqual(true);
       expect(carService.findAll).toHaveBeenCalledTimes(1);
     });
   });
@@ -49,6 +51,7 @@ describe('CarController', () => {
       const result: Car = await carController.getCar(1);
 
       expect(result).toEqual(mockCar);
+      expect(result instanceof Car).toEqual(true);
       expect(carService.findById).toHaveBeenCalledTimes(1);
     });
   });

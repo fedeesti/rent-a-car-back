@@ -5,6 +5,7 @@ import { Car } from '../domain/car.entity';
 import { CreateCarDto } from '../interface/car.dto';
 import { CarSchema } from './car.schema';
 import { ICarRepository } from '../application/car.repository.interface';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class CarRepository implements ICarRepository {
@@ -13,12 +14,13 @@ export class CarRepository implements ICarRepository {
     private readonly repository: Repository<Car>
   ) {}
 
-  find(): Promise<Car[]> {
-    return this.repository.find();
+  async find(): Promise<Car[]> {
+    const cars: Car[] = await this.repository.find();
+    return cars.map((car) => plainToClass(Car, car));
   }
 
   async findOne(id: number): Promise<Car> {
-    const car = await this.repository.findOne({
+    const car: Car = await this.repository.findOne({
       where: {
         id,
       },
@@ -28,7 +30,7 @@ export class CarRepository implements ICarRepository {
       throw new NotFoundException(`Car with id ${id} not found`);
     }
 
-    return car;
+    return plainToClass(Car, car);
   }
 
   async create(car: Car): Promise<Car> {
@@ -42,7 +44,7 @@ export class CarRepository implements ICarRepository {
       ...fieldsToUpdate,
     };
 
-    const car = await this.repository.preload(updateCar);
+    const car: Car = await this.repository.preload(updateCar);
 
     if (!car) {
       throw new NotFoundException(`Car with id ${id} not found`);
@@ -52,7 +54,7 @@ export class CarRepository implements ICarRepository {
   }
 
   async delete(id: number): Promise<Car> {
-    const car = await this.repository.findOne({
+    const car: Car = await this.repository.findOne({
       where: {
         id,
       },
