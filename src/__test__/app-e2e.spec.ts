@@ -12,115 +12,78 @@ import {
   mockCarDto,
   notFoundException,
 } from './utils/constants';
+import { UserModule } from '../module/user/user.module';
 
-describe('Cars', () => {
+describe('App e2e', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(testOrmConfig), CarModule],
+      imports: [TypeOrmModule.forRoot(testOrmConfig), CarModule, UserModule],
     }).compile();
 
     app = moduleRef.createNestApplication();
     await app.init();
   });
-
-  describe('GET /cars', () => {
-    it(`should return an array of cars`, async () => {
-      const { body } = await request(app.getHttpServer()).get('/cars').expect(200);
-
-      expect(body).toEqual([]);
-    });
-  });
-
-  describe('POST /cars', () => {
-    describe('Valid fields', () => {
-      it('should create a team successfully', async () => {
-        await request(app.getHttpServer())
-          .post('/cars')
-          .attach('img', Buffer.alloc(1024, 'fake'), 'test.jpg')
-          .field(mockCarDto)
-          .expect(201);
-
+  describe('Cars', () => {
+    describe('GET', () => {
+      it(`should return an array of cars`, async () => {
         const { body } = await request(app.getHttpServer()).get('/cars').expect(200);
 
-        expect(body).toHaveLength(1);
+        expect(body).toEqual([]);
       });
     });
 
-    describe('Invalid fields', () => {
-      it('when not uploading a file, should return a 422 status code with an error message', async () => {
-        const { body } = await request(app.getHttpServer()).post('/cars').send(mockInvalidCarDto);
+    describe('POST', () => {
+      describe('Valid fields', () => {
+        it('should create a team successfully', async () => {
+          await request(app.getHttpServer())
+            .post('/cars')
+            .attach('img', Buffer.alloc(1024, 'fake'), 'test.jpg')
+            .field(mockCarDto)
+            .expect(201);
 
-        expect(body).toEqual(errorFileIsRequired);
+          const { body } = await request(app.getHttpServer()).get('/cars').expect(200);
+
+          expect(body).toHaveLength(1);
+        });
       });
 
-      it('when sending an invalid car dto with a valid image, should return a 404 status code and an error message', async () => {
-        const { body } = await request(app.getHttpServer())
-          .post('/cars')
-          .attach('img', Buffer.alloc(1024, 'fake'), 'test.jpg')
-          .field(mockInvalidCarDto)
-          .expect(400);
+      describe('Invalid fields', () => {
+        it('when not uploading a file, should return a 422 status code with an error message', async () => {
+          const { body } = await request(app.getHttpServer()).post('/cars').send(mockInvalidCarDto);
 
-        expect(body.error).toEqual('Bad Request');
-      });
+          expect(body).toEqual(errorFileIsRequired);
+        });
 
-      it('when sending an invalid image with a valid car dto, should return a 422 status code and an error message', async () => {
-        const { body } = await request(app.getHttpServer())
-          .post('/cars')
-          .attach('img', Buffer.alloc(1024, 'fake'), 'test.txt')
-          .field(mockCarDto)
-          .expect(400);
+        it('when sending an invalid car dto with a valid image, should return a 404 status code and an error message', async () => {
+          const { body } = await request(app.getHttpServer())
+            .post('/cars')
+            .attach('img', Buffer.alloc(1024, 'fake'), 'test.jpg')
+            .field(mockInvalidCarDto)
+            .expect(400);
 
-        expect(body.error).toEqual('Bad Request');
-        expect(body.message).toEqual('Unsupported file type .txt');
-      });
-    });
-  });
+          expect(body.error).toEqual('Bad Request');
+        });
 
-  describe('GET /cars/:id', () => {
-    it('when receiving an invalid id, should return a message error with validation failed', async () => {
-      for (let i = 0; i < arraywithInvalidId.length; i++) {
-        const { body } = await request(app.getHttpServer())
-          .get(`/cars/${arraywithInvalidId[0]}`)
-          .expect(400);
+        it('when sending an invalid image with a valid car dto, should return a 422 status code and an error message', async () => {
+          const { body } = await request(app.getHttpServer())
+            .post('/cars')
+            .attach('img', Buffer.alloc(1024, 'fake'), 'test.txt')
+            .field(mockCarDto)
+            .expect(400);
 
-        expect(body).toEqual(badRequestIdValidation);
-      }
-    });
-
-    it('when the car does not exist in the database, it should return a not found error message', async () => {
-      const { body } = await request(app.getHttpServer()).get('/cars/2').expect(404);
-
-      expect(body).toEqual(notFoundException);
-    });
-
-    it('when receiving a valid ID, you must return a car', async () => {
-      const { body } = await request(app.getHttpServer()).get('/cars/1').expect(200);
-
-      expect(body.id).toEqual(1);
-      expect(body.brand).toEqual('test1');
-    });
-  });
-
-  describe('PATCH /cars/:id', () => {
-    describe('Valid fields', () => {
-      it('when sending valid fields, should return an updated car', async () => {
-        const { body } = await request(app.getHttpServer())
-          .patch('/cars/1')
-          .attach('img', Buffer.alloc(1024, 'fake'), 'test.jpg')
-          .field('brand', 'testPatch')
-          .expect(200);
-
-        expect(body.brand).toEqual('testPatch');
+          expect(body.error).toEqual('Bad Request');
+          expect(body.message).toEqual('Unsupported file type .txt');
+        });
       });
     });
 
-    describe('Invalid fields', () => {
+    describe('GET :id', () => {
       it('when receiving an invalid id, should return a message error with validation failed', async () => {
         for (let i = 0; i < arraywithInvalidId.length; i++) {
           const { body } = await request(app.getHttpServer())
-            .patch(`/cars/${arraywithInvalidId[0]}`)
+            .get(`/cars/${arraywithInvalidId[0]}`)
             .expect(400);
 
           expect(body).toEqual(badRequestIdValidation);
@@ -128,64 +91,103 @@ describe('Cars', () => {
       });
 
       it('when the car does not exist in the database, it should return a not found error message', async () => {
-        const { body } = await request(app.getHttpServer()).patch('/cars/2').expect(404);
+        const { body } = await request(app.getHttpServer()).get('/cars/2').expect(404);
 
         expect(body).toEqual(notFoundException);
       });
 
-      it('when sending invalid fields with a valid image, should return a 404 status code and an error message', async () => {
-        const invalidData = {
-          brand: 'P',
-          kms: 'test',
-          passengers: 'test',
-          price: 'test',
-          year: 'test',
-        };
+      it('when receiving a valid ID, you must return a car', async () => {
+        const { body } = await request(app.getHttpServer()).get('/cars/1').expect(200);
 
-        const { body } = await request(app.getHttpServer())
-          .patch('/cars/1')
-          .attach('img', Buffer.alloc(1024, 'fake'), 'test.jpg')
-          .field(invalidData)
-          .expect(400);
-
-        expect(body.error).toEqual('Bad Request');
-      });
-
-      it('when sending valid fields with an invalid image, should return a 404 status code and an error message', async () => {
-        const { body } = await request(app.getHttpServer())
-          .patch('/cars/1')
-          .attach('img', Buffer.alloc(1024, 'fake'), 'test.txt')
-          .field('model', 'test')
-          .expect(400);
-
-        expect(body.error).toEqual('Bad Request');
-        expect(body.message).toEqual('Unsupported file type .txt');
+        expect(body.id).toEqual(1);
+        expect(body.brand).toEqual('test1');
       });
     });
-  });
 
-  describe('DELETE /car/:id', () => {
-    it('when receiving an invalid id, should return a message error with validation failed', async () => {
-      for (let i = 0; i < arraywithInvalidId.length; i++) {
-        const { body } = await request(app.getHttpServer())
-          .delete(`/cars/${arraywithInvalidId[0]}`)
-          .expect(400);
+    describe('PATCH :id', () => {
+      describe('Valid fields', () => {
+        it('when sending valid fields, should return an updated car', async () => {
+          const { body } = await request(app.getHttpServer())
+            .patch('/cars/1')
+            .attach('img', Buffer.alloc(1024, 'fake'), 'test.jpg')
+            .field('brand', 'testPatch')
+            .expect(200);
 
-        expect(body).toEqual(badRequestIdValidation);
-      }
+          expect(body.brand).toEqual('testPatch');
+        });
+      });
+
+      describe('Invalid fields', () => {
+        it('when receiving an invalid id, should return a message error with validation failed', async () => {
+          for (let i = 0; i < arraywithInvalidId.length; i++) {
+            const { body } = await request(app.getHttpServer())
+              .patch(`/cars/${arraywithInvalidId[0]}`)
+              .expect(400);
+
+            expect(body).toEqual(badRequestIdValidation);
+          }
+        });
+
+        it('when the car does not exist in the database, it should return a not found error message', async () => {
+          const { body } = await request(app.getHttpServer()).patch('/cars/2').expect(404);
+
+          expect(body).toEqual(notFoundException);
+        });
+
+        it('when sending invalid fields with a valid image, should return a 404 status code and an error message', async () => {
+          const invalidData = {
+            brand: 'P',
+            kms: 'test',
+            passengers: 'test',
+            price: 'test',
+            year: 'test',
+          };
+
+          const { body } = await request(app.getHttpServer())
+            .patch('/cars/1')
+            .attach('img', Buffer.alloc(1024, 'fake'), 'test.jpg')
+            .field(invalidData)
+            .expect(400);
+
+          expect(body.error).toEqual('Bad Request');
+        });
+
+        it('when sending valid fields with an invalid image, should return a 404 status code and an error message', async () => {
+          const { body } = await request(app.getHttpServer())
+            .patch('/cars/1')
+            .attach('img', Buffer.alloc(1024, 'fake'), 'test.txt')
+            .field('model', 'test')
+            .expect(400);
+
+          expect(body.error).toEqual('Bad Request');
+          expect(body.message).toEqual('Unsupported file type .txt');
+        });
+      });
     });
-    it('when the car does not exist in the database, it should return a not found error message', async () => {
-      const { body } = await request(app.getHttpServer()).delete('/cars/2').expect(404);
 
-      expect(body).toEqual(notFoundException);
-    });
+    describe('DELETE :id', () => {
+      it('when receiving an invalid id, should return a message error with validation failed', async () => {
+        for (let i = 0; i < arraywithInvalidId.length; i++) {
+          const { body } = await request(app.getHttpServer())
+            .delete(`/cars/${arraywithInvalidId[0]}`)
+            .expect(400);
 
-    it('when receiving a valid ID, you should delete a car', async () => {
-      await request(app.getHttpServer()).delete('/cars/1').expect(200);
+          expect(body).toEqual(badRequestIdValidation);
+        }
+      });
+      it('when the car does not exist in the database, it should return a not found error message', async () => {
+        const { body } = await request(app.getHttpServer()).delete('/cars/2').expect(404);
 
-      const { body } = await request(app.getHttpServer()).get('/cars').expect(200);
+        expect(body).toEqual(notFoundException);
+      });
 
-      expect(body).toEqual([]);
+      it('when receiving a valid ID, you should delete a car', async () => {
+        await request(app.getHttpServer()).delete('/cars/1').expect(200);
+
+        const { body } = await request(app.getHttpServer()).get('/cars').expect(200);
+
+        expect(body).toEqual([]);
+      });
     });
   });
 
