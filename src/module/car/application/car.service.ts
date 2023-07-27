@@ -9,11 +9,6 @@ export class CarService {
 
   async findAll(): Promise<Car[]> {
     const cars = await this.carRepository.find();
-    console.log('CarService');
-    cars[0] instanceof Car
-      ? console.log('Es una entidad Car')
-      : console.log('No es una entidad Car');
-
     return cars;
   }
 
