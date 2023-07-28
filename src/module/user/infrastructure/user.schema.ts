@@ -1,4 +1,4 @@
-import { BaseSchema } from 'src/common/infrastructure/baseSchema';
+import { BaseSchema } from '../../../common/infrastructure/baseSchema';
 import { User } from '../domain/user.entity';
 
 export const UserSchema = new BaseSchema<User>({

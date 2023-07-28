@@ -1,7 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserController } from '../user.controller';
-import { UserService } from '../../application/user.service';
 import { CreateUserDto } from '../user.dto';
+import { UserService } from '../../application/user.service';
+import { UserModule } from '../../user.module';
+import { UserSchema } from '../../infrastructure/user.schema';
+import { User } from '../../domain/user.entity';
+import { mockArrayOfUsers, mockUser } from '../../../../__test__/utils/mock-users';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -9,9 +14,11 @@ describe('UserController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [UserController],
-      providers: [UserService],
-    }).compile();
+      imports: [UserModule],
+    })
+      .overrideProvider(getRepositoryToken(UserSchema))
+      .useValue(jest.fn())
+      .compile();
 
     service = module.get<UserService>(UserService);
     controller = module.get<UserController>(UserController);
@@ -23,13 +30,13 @@ describe('UserController', () => {
 
   describe('getUsers', () => {
     it('should return an array of users', async () => {
-      const response = 'all users';
+      jest
+        .spyOn(service, 'findUsers')
+        .mockImplementation(() => Promise.resolve(mockArrayOfUsers as unknown as Promise<User[]>));
 
-      jest.spyOn(service, 'findUsers').mockImplementation(() => response as string);
+      const users = await controller.getUsers();
 
-      const users = controller.getUsers();
-
-      expect(users).toEqual(response);
+      expect(users).toEqual(mockArrayOfUsers);
       expect(service.findUsers).toHaveBeenCalledTimes(1);
     });
   });
@@ -37,37 +44,27 @@ describe('UserController', () => {
   describe('getUser', () => {
     it('should return a user', async () => {
       const userId = 1;
-      const response = `User with id:${userId}`;
+      jest
+        .spyOn(service, 'findUserById')
+        .mockImplementation(() => Promise.resolve(mockUser as unknown as Promise<User>));
 
-      jest.spyOn(service, 'findUserById').mockImplementation(() => response as string);
+      const user = await controller.getUser(userId);
 
-      const user = controller.getUser(userId);
-
-      expect(user).toEqual(response);
+      expect(user).toEqual(mockUser);
       expect(service.findUserById).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('createUser', () => {
     it('should create a user successfully', async () => {
-      const response = {
-        name: 'test',
-        lastname: 'test',
-        docType: 'test',
-        docNumber: 'test',
-        nationality: '12345678',
-        address: 'test',
-        phone: 'test',
-        email: 'test@test.com',
-        birthdate: new Date(),
-      };
-
-      jest.spyOn(service, 'create').mockImplementation(() => response);
+      jest
+        .spyOn(service, 'create')
+        .mockImplementation(() => Promise.resolve(mockUser as unknown as Promise<User>));
 
       const userDto = new CreateUserDto();
-      const userCreated = controller.createUser(userDto);
+      const userCreated = await controller.createUser(userDto);
 
-      expect(userCreated).toEqual(response);
+      expect(userCreated).toEqual(mockUser);
       expect(service.create).toHaveBeenCalledTimes(1);
     });
   });
@@ -76,13 +73,14 @@ describe('UserController', () => {
     it('should update a user successfully', async () => {
       const userId = 1;
       const fieldsToUpdate = { name: 'update' };
-      const response = `User with id:${userId} update this fields ${fieldsToUpdate} has been updated`;
 
-      jest.spyOn(service, 'update').mockImplementation(() => response);
+      jest
+        .spyOn(service, 'update')
+        .mockImplementation(() => Promise.resolve(mockUser as unknown as Promise<User>));
 
-      const userUpdated = controller.updateUser(userId, fieldsToUpdate);
+      const userUpdated = await controller.updateUser(userId, fieldsToUpdate);
 
-      expect(userUpdated).toEqual(response);
+      expect(userUpdated).toEqual(mockUser);
       expect(service.update).toHaveBeenCalledTimes(1);
     });
   });
@@ -92,11 +90,13 @@ describe('UserController', () => {
       const userId = 1;
       const response = `User with id:${userId} has been deleted`;
 
-      jest.spyOn(service, 'delete').mockImplementation(() => response);
+      jest
+        .spyOn(service, 'delete')
+        .mockImplementation(() => Promise.resolve(mockUser as unknown as Promise<User>));
 
-      const userDeleted = controller.deleteUser(userId);
+      const userDeleted = await controller.deleteUser(userId);
 
-      expect(userDeleted).toEqual(response);
+      expect(userDeleted).toEqual(mockUser);
       expect(service.delete).toHaveBeenCalledTimes(1);
     });
   });
