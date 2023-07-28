@@ -1,77 +1,16 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { BaseSchema } from '../../common/infrastructure/baseSchema';
-import { Car } from 'src/module/car/domain/car.entity';
 import { CarSchema } from '../../module/car/infrastructure/car.schema';
+import { UserSchema } from '../../module/user/infrastructure/user.schema';
 
 export const testOrmConfig: TypeOrmModuleOptions = {
   type: 'sqlite',
   database: ':memory:',
-  entities: [BaseSchema, CarSchema],
+  entities: [BaseSchema, CarSchema, UserSchema],
   synchronize: true,
 };
 
-export const mockArrayOfCars: Car[] = [
-  {
-    id: 1,
-    brand: 'test',
-    model: 'test',
-    color: 'test',
-    img: 'test.png',
-    kms: 1,
-    passengers: 1,
-    price: 1,
-    year: 2016,
-    transmission: 'manual',
-    airConditioner: true,
-    deletedAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
-
-export const mockCar: Car = {
-  id: 1,
-  brand: 'test',
-  model: 'test',
-  color: 'test',
-  img: 'test.png',
-  kms: 1,
-  passengers: 1,
-  price: 1,
-  year: 2016,
-  transmission: 'manual',
-  airConditioner: true,
-  deletedAt: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-export const mockCarDto = {
-  brand: 'test1',
-  model: 'test',
-  color: 'test',
-  kms: 1,
-  passengers: 1,
-  price: 1,
-  year: 1,
-  transmission: 'test',
-  airConditioner: true,
-};
-
 export const arraywithInvalidId = ['1,5', '0,4', ',2', 'a_c', 'a-c', '-1', '1-', 'a*c', 'a+c'];
-
-export const mockFile: Express.Multer.File = {
-  fieldname: 'img',
-  originalname: 'peugeot-207.jpg',
-  encoding: '7bit',
-  mimetype: 'image/jpeg',
-  size: 7528,
-  destination: 'test',
-  stream: undefined,
-  filename: '',
-  path: '',
-  buffer: undefined,
-};
 
 export const notFoundException = {
   message: `Car with id 2 not found`,

@@ -39,7 +39,7 @@ export class UserRepository implements IUserRepository {
   async update(id: number, fieldsToUpdate: Partial<User>): Promise<User> {
     const partialUser = {
       id,
-      fieldsToUpdate,
+      ...fieldsToUpdate,
     };
 
     const user: User = await this.repository.preload(partialUser);

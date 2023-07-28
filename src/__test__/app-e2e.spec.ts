@@ -3,16 +3,21 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CarModule } from '../module/car/car.module';
+import { UserModule } from '../module/user/user.module';
 import {
   testOrmConfig,
   badRequestIdValidation,
   arraywithInvalidId,
   errorFileIsRequired,
   mockInvalidCarDto,
-  mockCarDto,
-  notFoundException,
 } from './utils/constants';
-import { UserModule } from '../module/user/user.module';
+import { mockCarDto, carNotFoundException } from './utils/mock-cars';
+import {
+  BadRequestValidationWithEmptyFields,
+  mockUser,
+  mockUserDto,
+  userNotFoundException,
+} from './utils/mock-users';
 
 describe('App e2e', () => {
   let app: INestApplication;
@@ -25,7 +30,7 @@ describe('App e2e', () => {
     app = moduleRef.createNestApplication();
     await app.init();
   });
-  describe('Cars', () => {
+  describe('Cars /cars', () => {
     describe('GET', () => {
       it(`should return an array of cars`, async () => {
         const { body } = await request(app.getHttpServer()).get('/cars').expect(200);
@@ -93,7 +98,7 @@ describe('App e2e', () => {
       it('when the car does not exist in the database, it should return a not found error message', async () => {
         const { body } = await request(app.getHttpServer()).get('/cars/2').expect(404);
 
-        expect(body).toEqual(notFoundException);
+        expect(body).toEqual(carNotFoundException);
       });
 
       it('when receiving a valid ID, you must return a car', async () => {
@@ -131,7 +136,7 @@ describe('App e2e', () => {
         it('when the car does not exist in the database, it should return a not found error message', async () => {
           const { body } = await request(app.getHttpServer()).patch('/cars/2').expect(404);
 
-          expect(body).toEqual(notFoundException);
+          expect(body).toEqual(carNotFoundException);
         });
 
         it('when sending invalid fields with a valid image, should return a 404 status code and an error message', async () => {
@@ -178,13 +183,157 @@ describe('App e2e', () => {
       it('when the car does not exist in the database, it should return a not found error message', async () => {
         const { body } = await request(app.getHttpServer()).delete('/cars/2').expect(404);
 
-        expect(body).toEqual(notFoundException);
+        expect(body).toEqual(carNotFoundException);
       });
 
       it('when receiving a valid ID, you should delete a car', async () => {
         await request(app.getHttpServer()).delete('/cars/1').expect(200);
 
         const { body } = await request(app.getHttpServer()).get('/cars').expect(200);
+
+        expect(body).toEqual([]);
+      });
+    });
+  });
+
+  describe('Users /user', () => {
+    describe('GET', () => {
+      it('should return an array of users', async () => {
+        const { body } = await request(app.getHttpServer()).get('/user').expect(200);
+
+        expect(body).toEqual([]);
+      });
+      it('', async () => {});
+    });
+
+    describe('POST', () => {
+      describe('Valid fields', () => {
+        it('should create a user successfully', async () => {
+          await request(app.getHttpServer()).post('/user').send(mockUserDto).expect(201);
+
+          const { body } = await request(app.getHttpServer()).get('/user').expect(200);
+
+          expect(body).toHaveLength(1);
+        });
+      });
+
+      describe('Invalid fields', () => {
+        it('when sending a user dto empty, should return a bad request validation', async () => {
+          const { body } = await request(app.getHttpServer()).post('/user').send({}).expect(400);
+
+          expect(body).toEqual(BadRequestValidationWithEmptyFields);
+        });
+      });
+    });
+
+    describe('GET :id', () => {
+      it('when receiving an invalid id, should return a message error with validation failed', async () => {
+        for (let i = 0; i < arraywithInvalidId.length; i++) {
+          const { body } = await request(app.getHttpServer())
+            .get(`/user/${arraywithInvalidId[0]}`)
+            .expect(400);
+
+          expect(body).toEqual(badRequestIdValidation);
+        }
+      });
+
+      it('when the user does not exist, it should return a not found error message', async () => {
+        const { body } = await request(app.getHttpServer()).get('/user/2').expect(404);
+
+        expect(body).toEqual(userNotFoundException);
+      });
+      it('when receiving a valid ID, you must return a user', async () => {
+        const { body } = await request(app.getHttpServer()).get('/user/1').expect(200);
+
+        expect(body.id).toEqual(1);
+        expect(body.name).toEqual('test');
+      });
+    });
+
+    describe('PATH :id', () => {
+      describe('Valid fields', () => {
+        it('should return an updated user', async () => {
+          const { body } = await request(app.getHttpServer())
+            .patch('/user/1')
+            .send({ name: 'update' })
+            .expect(200);
+
+          expect(body.name).toEqual('update');
+        });
+      });
+
+      describe('Invalid fields', () => {
+        it('when receiving an invalid id, should return a message error with validation failed', async () => {
+          for (let i = 0; i < arraywithInvalidId.length; i++) {
+            const { body } = await request(app.getHttpServer())
+              .patch(`/user/${arraywithInvalidId[0]}`)
+              .expect(400);
+
+            expect(body).toEqual(badRequestIdValidation);
+          }
+        });
+
+        it('when the user does not exist, it should return a not found error message', async () => {
+          const { body } = await request(app.getHttpServer()).patch('/user/2').expect(404);
+
+          expect(body).toEqual(userNotFoundException);
+        });
+        it('when sending an invalid email, should return a message error', async () => {
+          const invalidEmail = [
+            {
+              email: 'http://www.test.com',
+            },
+            {
+              email: 'test@com',
+            },
+            {
+              email: 'test',
+            },
+            {
+              email: '1234',
+            },
+          ];
+
+          const dataError = [
+            {
+              field: 'email',
+              error: 'email must be an email',
+            },
+          ];
+
+          for (let i = 0; i < invalidEmail.length; i++) {
+            const { body } = await request(app.getHttpServer())
+              .patch('/user/1')
+              .send(invalidEmail[i])
+              .expect(400);
+
+            expect(body.error).toBe('Bad Request');
+            expect(body.message).toEqual(expect.arrayContaining(dataError));
+          }
+        });
+      });
+    });
+
+    describe('DELETE :id', () => {
+      it('when receiving an invalid id, should return a message error with validation failed', async () => {
+        for (let i = 0; i < arraywithInvalidId.length; i++) {
+          const { body } = await request(app.getHttpServer())
+            .delete(`/user/${arraywithInvalidId[0]}`)
+            .expect(400);
+
+          expect(body).toEqual(badRequestIdValidation);
+        }
+      });
+
+      it('when the user does not exist, it should return a not found error message', async () => {
+        const { body } = await request(app.getHttpServer()).delete('/user/2').expect(404);
+
+        expect(body).toEqual(userNotFoundException);
+      });
+      it('when receiving a valid ID, you must return a user', async () => {
+        await request(app.getHttpServer()).delete('/user/1').expect(200);
+
+        const { body } = await request(app.getHttpServer()).get('/user').expect(200);
 
         expect(body).toEqual([]);
       });
