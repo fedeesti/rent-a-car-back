@@ -1,6 +1,6 @@
-import { BaseEntity } from 'src/common/domain/base.entity';
+import { BaseEntity } from '../../../common/domain/base.entity';
 
-export class UserEntity extends BaseEntity {
+export class User extends BaseEntity {
   public name: string;
   public lastname: string;
   public docType: string;
