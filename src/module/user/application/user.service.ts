@@ -1,25 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from '../interface/user.dto';
+import { UpdateUserDto } from '../interface/user.dto';
+import { UserRepository } from '../infrastructure/user.repository';
+import { User } from '../domain/user.entity';
 
 @Injectable()
 export class UserService {
-  findUsers() {
-    return 'all users';
+  constructor(private readonly userRepository: UserRepository) {}
+
+  async findUsers(): Promise<User[]> {
+    return await this.userRepository.find();
   }
 
-  findUserById(userId: number) {
-    return `User with id:${userId}`;
+  async findUserById(userId: number): Promise<User> {
+    return await this.userRepository.findOne(userId);
   }
 
-  create(userDto: CreateUserDto) {
-    return userDto;
+  async create(user: User): Promise<User> {
+    return await this.userRepository.create(user);
   }
 
-  update(userId: number, fieldsToUpdate: UpdateUserDto) {
-    return `User with id:${userId} update this fields ${fieldsToUpdate} has been updated`;
+  async update(userId: number, fieldsToUpdate: UpdateUserDto): Promise<User> {
+    return await this.userRepository.update(userId, fieldsToUpdate);
   }
 
-  delete(userId: number) {
-    return `User with id:${userId} has been deleted`;
+  async delete(userId: number): Promise<User> {
+    return await this.userRepository.delete(userId);
   }
 }
