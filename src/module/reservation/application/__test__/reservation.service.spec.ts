@@ -5,23 +5,8 @@ import { ReservationSchema } from '../../infrastructure/reservation.schema';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Reservation } from '../../domain/reservation.entity';
-import { User } from '../../../user/domain/user.entity';
-import { Car } from '../../../car/domain/car.entity';
 import { UpdateReservationDto } from '../../interface/reservation.dto';
-
-const mockReservation: Reservation = {
-  id: 1,
-  startDate: new Date(),
-  finishDate: new Date(),
-  pricePerDay: 1,
-  totalPrice: 5,
-  paymentMethod: 'credit card',
-  statusId: true,
-  car: new Car(),
-  user: new User(),
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
+import { mockReservation } from '../../../../__test__/utils/mock-reservations';
 
 describe('ReservationService', () => {
   let service: ReservationService;

@@ -24,7 +24,7 @@ export class ReservationRepository implements IReservationRepository {
       },
     });
 
-    if (!reservation) throw new NotFoundException(`User with id ${id} not found`);
+    if (!reservation) throw new NotFoundException(`Reservation with id ${id} not found`);
 
     return reservation;
   }
@@ -41,7 +41,7 @@ export class ReservationRepository implements IReservationRepository {
 
     const reservation = await this.repository.preload(partialReservation);
 
-    if (!reservation) throw new NotFoundException(`User with id ${id} not found`);
+    if (!reservation) throw new NotFoundException(`Reservation with id ${id} not found`);
 
     return await this.repository.save(reservation);
   }
@@ -53,7 +53,7 @@ export class ReservationRepository implements IReservationRepository {
       },
     });
 
-    if (!reservation) throw new NotFoundException(`User with id ${id} not found`);
+    if (!reservation) throw new NotFoundException(`Reservation with id ${id} not found`);
 
     return this.repository.remove(reservation);
   }
