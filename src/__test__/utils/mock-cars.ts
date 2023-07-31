@@ -50,6 +50,18 @@ export const mockCarDto = {
   airConditioner: true,
 };
 
+export const mockInvalidCarDto = {
+  brand: '',
+  model: 207,
+  color: true,
+  kms: 'test',
+  passengers: 'test',
+  price: 'test',
+  year: 'test',
+  transmission: true,
+  airConditioner: 'undefined',
+};
+
 export const mockFile: Express.Multer.File = {
   fieldname: 'img',
   originalname: 'peugeot-207.jpg',

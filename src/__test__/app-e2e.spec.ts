@@ -10,9 +10,8 @@ import {
   badRequestIdValidation,
   arraywithInvalidId,
   errorFileIsRequired,
-  mockInvalidCarDto,
 } from './utils/constants';
-import { mockCarDto, carNotFoundException } from './utils/mock-cars';
+import { mockCarDto, carNotFoundException, mockInvalidCarDto } from './utils/mock-cars';
 import {
   BadRequestValidationWithEmptyFields,
   mockUserDto,
