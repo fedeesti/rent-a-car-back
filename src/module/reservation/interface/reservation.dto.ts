@@ -1,16 +1,16 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsDate, IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Car } from '../../car/domain/car.entity';
 import { User } from '../../user/domain/user.entity';
 
 export class CreateReservationDto {
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   startDate: Date;
 
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   finishDate: Date;
 
   @IsNotEmpty()
