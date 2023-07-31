@@ -33,4 +33,22 @@ export const ReservationSchema = new BaseSchema<Reservation>({
       name: 'status',
     },
   },
+  relations: {
+    car: {
+      type: 'many-to-one',
+      target: () => Car,
+      inverseSide: 'reservations',
+      joinColumn: {
+        name: 'car_id',
+      },
+    },
+    user: {
+      type: 'many-to-one',
+      target: () => User,
+      inverseSide: 'reservations',
+      joinColumn: {
+        name: 'user_id',
+      },
+    },
+  },
 });

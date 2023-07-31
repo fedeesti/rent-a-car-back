@@ -1,4 +1,5 @@
 import { BaseEntity } from '../../../common/domain/base.entity';
+import { Reservation } from '../../reservation/domain/reservation.entity';
 
 export class User extends BaseEntity {
   public name: string;
@@ -10,4 +11,5 @@ export class User extends BaseEntity {
   public phone: string;
   public email: string;
   public birthdate: Date;
+  public reservations: Reservation[];
 }
