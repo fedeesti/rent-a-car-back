@@ -1,26 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { CreateReservationDto, UpdateReservationDto } from '../interface/reservation.dto';
+import { UpdateReservationDto } from '../interface/reservation.dto';
 import { Reservation } from '../domain/reservation.entity';
+import { ReservationRepository } from '../infrastructure/reservation.repository';
 
 @Injectable()
 export class ReservationService {
-  findAll() {
-    return 'Get all reservations';
+  constructor(private readonly reservationRepository: ReservationRepository) {}
+
+  async findAll(): Promise<Reservation[]> {
+    return await this.reservationRepository.find();
   }
 
-  findOneById(id: number) {
-    return `Reservation with id: ${id}`;
+  async findOneById(id: number): Promise<Reservation> {
+    return await this.reservationRepository.findOne(id);
   }
 
-  create(newReservation: Reservation) {
-    return `Reservation: ${newReservation} has been created`;
+  async create(newReservation: Reservation): Promise<Reservation> {
+    return await this.reservationRepository.create(newReservation);
   }
 
-  update(id: number, fieldsToUpdate: UpdateReservationDto) {
-    return `Reservation with id: ${id} with these fields: ${fieldsToUpdate} has been updated `;
+  async update(id: number, fieldsToUpdate: UpdateReservationDto): Promise<Reservation> {
+    return await this.reservationRepository.update(id, fieldsToUpdate);
   }
 
-  delete(id: number) {
-    return `Reservation with id: ${id} has been deleted`;
+  async delete(id: number): Promise<Reservation> {
+    return await this.reservationRepository.delete(id);
   }
 }

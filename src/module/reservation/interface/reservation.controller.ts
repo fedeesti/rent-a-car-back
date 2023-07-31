@@ -10,13 +10,13 @@ export class ReservationController {
   constructor(private readonly service: ReservationService) {}
 
   @Get()
-  getReservations() {
-    return this.service.findAll();
+  async getReservations() {
+    return await this.service.findAll();
   }
 
   @Get(':reservationId')
-  getReservation(@Param('reservationId', ParseIntPipe) reservationId: number) {
-    return this.service.findOneById(reservationId);
+  async getReservation(@Param('reservationId', ParseIntPipe) reservationId: number) {
+    return await this.service.findOneById(reservationId);
   }
 
   @Post()
