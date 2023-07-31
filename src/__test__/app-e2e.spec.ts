@@ -2,8 +2,9 @@ import request from 'supertest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CarModule } from '../module/car/car.module';
+import { ReservationModule } from '../module/reservation/reservation.module';
 import { UserModule } from '../module/user/user.module';
+import { CarModule } from '../module/car/car.module';
 import {
   testOrmConfig,
   badRequestIdValidation,
@@ -14,23 +15,29 @@ import {
 import { mockCarDto, carNotFoundException } from './utils/mock-cars';
 import {
   BadRequestValidationWithEmptyFields,
-  mockUser,
   mockUserDto,
   userNotFoundException,
 } from './utils/mock-users';
+import {
+  RESERVATION_ROUTE,
+  mockReservationDto,
+  reservationBadRequestValidationWithEmptyFields,
+  reservationNotFoundMsgError,
+} from './utils/mock-reservations';
 
 describe('App e2e', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(testOrmConfig), CarModule, UserModule],
+      imports: [TypeOrmModule.forRoot(testOrmConfig), CarModule, UserModule, ReservationModule],
     }).compile();
 
     app = moduleRef.createNestApplication();
     await app.init();
   });
-  describe('Cars /cars', () => {
+
+  describe('Cars module', () => {
     describe('GET', () => {
       it(`should return an array of cars`, async () => {
         const { body } = await request(app.getHttpServer()).get('/cars').expect(200);
@@ -180,6 +187,7 @@ describe('App e2e', () => {
           expect(body).toEqual(badRequestIdValidation);
         }
       });
+
       it('when the car does not exist in the database, it should return a not found error message', async () => {
         const { body } = await request(app.getHttpServer()).delete('/cars/2').expect(404);
 
@@ -196,7 +204,7 @@ describe('App e2e', () => {
     });
   });
 
-  describe('Users /user', () => {
+  describe('Users module', () => {
     describe('GET', () => {
       it('should return an array of users', async () => {
         const { body } = await request(app.getHttpServer()).get('/user').expect(200);
@@ -242,6 +250,7 @@ describe('App e2e', () => {
 
         expect(body).toEqual(userNotFoundException);
       });
+
       it('when receiving a valid ID, you must return a user', async () => {
         const { body } = await request(app.getHttpServer()).get('/user/1').expect(200);
 
@@ -278,6 +287,7 @@ describe('App e2e', () => {
 
           expect(body).toEqual(userNotFoundException);
         });
+
         it('when sending an invalid email, should return a message error', async () => {
           const invalidEmail = [
             {
@@ -330,10 +340,135 @@ describe('App e2e', () => {
 
         expect(body).toEqual(userNotFoundException);
       });
+
       it('when receiving a valid ID, you must return a user', async () => {
         await request(app.getHttpServer()).delete('/user/1').expect(200);
 
         const { body } = await request(app.getHttpServer()).get('/user').expect(200);
+
+        expect(body).toEqual([]);
+      });
+    });
+  });
+
+  describe('Reservation module', () => {
+    describe('GET', () => {
+      it('should return an array of reservations', async () => {
+        const { body } = await request(app.getHttpServer()).get(`${RESERVATION_ROUTE}`).expect(200);
+
+        expect(body).toEqual([]);
+      });
+    });
+
+    describe('POST', () => {
+      it('should create a reservation successfully', async () => {
+        await request(app.getHttpServer())
+          .post(`${RESERVATION_ROUTE}`)
+          .send(mockReservationDto)
+          .expect(201);
+
+        const { body } = await request(app.getHttpServer()).get(`${RESERVATION_ROUTE}`).expect(200);
+
+        expect(body).toHaveLength(1);
+      });
+
+      describe('Invalid fields', () => {
+        it('when sending a reservation dto empty, should return a bad request validation', async () => {
+          const { body } = await request(app.getHttpServer())
+            .post(`${RESERVATION_ROUTE}`)
+            .send({})
+            .expect(400);
+
+          expect(body).toEqual(reservationBadRequestValidationWithEmptyFields);
+        });
+      });
+    });
+
+    describe('GET :id', () => {
+      it('when receiving an invalid id, should return a message error with validation failed', async () => {
+        for (let i = 0; i < arraywithInvalidId.length; i++) {
+          const { body } = await request(app.getHttpServer())
+            .get(`${RESERVATION_ROUTE}/${arraywithInvalidId[0]}`)
+            .expect(400);
+
+          expect(body).toEqual(badRequestIdValidation);
+        }
+      });
+
+      it('when the reservation does not exist, should return a not found error message', async () => {
+        const { body } = await request(app.getHttpServer())
+          .get(`${RESERVATION_ROUTE}/2`)
+          .send({})
+          .expect(404);
+
+        expect(body).toEqual(reservationNotFoundMsgError);
+      });
+
+      it('when receiving a valid ID, you must return a reservation', async () => {
+        const { body } = await request(app.getHttpServer())
+          .get(`${RESERVATION_ROUTE}/1`)
+          .expect(200);
+
+        expect(body.id).toEqual(1);
+        expect(body.pricePerDay).toEqual(1);
+        expect(body.totalPrice).toEqual(5);
+      });
+    });
+
+    describe('PATCH :id', () => {
+      it('should return an updated reservation', async () => {
+        const { body } = await request(app.getHttpServer())
+          .patch(`${RESERVATION_ROUTE}/1`)
+          .send({ pricePerDay: 2 })
+          .expect(200);
+
+        expect(body.pricePerDay).toEqual(2);
+      });
+
+      describe('Invalid fields', () => {
+        it('when receiving an invalid id, should return a message error with validation failed', async () => {
+          for (let i = 0; i < arraywithInvalidId.length; i++) {
+            const { body } = await request(app.getHttpServer())
+              .patch(`${RESERVATION_ROUTE}/${arraywithInvalidId[0]}`)
+              .expect(400);
+
+            expect(body).toEqual(badRequestIdValidation);
+          }
+        });
+
+        it('when the reservation does not exist, it should return a not found error message', async () => {
+          const { body } = await request(app.getHttpServer())
+            .patch(`${RESERVATION_ROUTE}/2`)
+            .expect(404);
+
+          expect(body).toEqual(reservationNotFoundMsgError);
+        });
+      });
+    });
+
+    describe('DELETE :id', () => {
+      it('when receiving an invalid id, should return a message error with validation failed', async () => {
+        for (let i = 0; i < arraywithInvalidId.length; i++) {
+          const { body } = await request(app.getHttpServer())
+            .delete(`${RESERVATION_ROUTE}/${arraywithInvalidId[0]}`)
+            .expect(400);
+
+          expect(body).toEqual(badRequestIdValidation);
+        }
+      });
+
+      it('when the reservation does not exist, should return a not found error message', async () => {
+        const { body } = await request(app.getHttpServer())
+          .delete(`${RESERVATION_ROUTE}/2`)
+          .expect(404);
+
+        expect(body).toEqual(reservationNotFoundMsgError);
+      });
+
+      it('when receiving a valid ID, you must delete a reservation', async () => {
+        await request(app.getHttpServer()).delete(`${RESERVATION_ROUTE}/1`).expect(200);
+
+        const { body } = await request(app.getHttpServer()).get(`${RESERVATION_ROUTE}`).expect(200);
 
         expect(body).toEqual([]);
       });

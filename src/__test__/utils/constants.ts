@@ -2,11 +2,12 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { BaseSchema } from '../../common/infrastructure/baseSchema';
 import { CarSchema } from '../../module/car/infrastructure/car.schema';
 import { UserSchema } from '../../module/user/infrastructure/user.schema';
+import { ReservationSchema } from '../../module/reservation/infrastructure/reservation.schema';
 
 export const testOrmConfig: TypeOrmModuleOptions = {
   type: 'sqlite',
   database: ':memory:',
-  entities: [BaseSchema, CarSchema, UserSchema],
+  entities: [BaseSchema, CarSchema, UserSchema, ReservationSchema],
   synchronize: true,
 };
 
