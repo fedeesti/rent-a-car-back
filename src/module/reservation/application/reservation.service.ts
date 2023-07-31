@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { CreateReservationDto, UpdateReservationDto } from '../interface/reservation.dto';
+import { Reservation } from '../domain/reservation.entity';
 
 @Injectable()
 export class ReservationService {
@@ -10,11 +12,11 @@ export class ReservationService {
     return `Reservation with id: ${id}`;
   }
 
-  create(createReservationDto: any) {
-    return `Reservation: ${createReservationDto} has been created`;
+  create(newReservation: Reservation) {
+    return `Reservation: ${newReservation} has been created`;
   }
 
-  update(id: number, fieldsToUpdate: any) {
+  update(id: number, fieldsToUpdate: UpdateReservationDto) {
     return `Reservation with id: ${id} with these fields: ${fieldsToUpdate} has been updated `;
   }
 

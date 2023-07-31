@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReservationController } from '../reservation.controller';
 import { ReservationService } from '../../application/reservation.service';
 import { ReservationModule } from '../../reservation.module';
+import { CreateReservationDto, UpdateReservationDto } from '../reservation.dto';
 
 describe('ReservationController', () => {
   let controller: ReservationController;
@@ -24,7 +25,7 @@ describe('ReservationController', () => {
     it('should return an array of reservations', () => {
       jest.spyOn(service, 'findAll').mockImplementation(() => 'Get all reservations');
 
-      const reservations = service.findAll();
+      const reservations = controller.getReservations();
 
       expect(reservations).toEqual('Get all reservations');
       expect(service.findAll).toHaveBeenCalledTimes(1);
@@ -35,7 +36,7 @@ describe('ReservationController', () => {
     it('should return a reservation', () => {
       jest.spyOn(service, 'findOneById').mockImplementation(() => `Reservation with id: 1`);
 
-      const reservation = service.findOneById(1);
+      const reservation = controller.getReservation(1);
 
       expect(reservation).toEqual('Reservation with id: 1');
       expect(service.findOneById).toHaveBeenCalledTimes(1);
@@ -46,7 +47,8 @@ describe('ReservationController', () => {
     it('should create a reservation successfully', () => {
       jest.spyOn(service, 'create').mockImplementation(() => `Reservation: {} has been created`);
 
-      const createReservation = service.create({});
+      const reservation = new CreateReservationDto();
+      const createReservation = controller.createReservation(reservation);
 
       expect(createReservation).toEqual(`Reservation: {} has been created`);
       expect(service.create).toHaveBeenCalledTimes(1);
@@ -59,7 +61,8 @@ describe('ReservationController', () => {
         .spyOn(service, 'update')
         .mockImplementation(() => 'Reservation with id: 1 with these fields: {} has been updated');
 
-      const updateReservation = service.update(1, {});
+      const fields = new UpdateReservationDto();
+      const updateReservation = controller.updateReservation(1, fields);
 
       expect(updateReservation).toEqual(
         'Reservation with id: 1 with these fields: {} has been updated'
@@ -74,7 +77,7 @@ describe('ReservationController', () => {
         .spyOn(service, 'delete')
         .mockImplementation(() => 'Reservation with id: 1 has been deleted');
 
-      const deletReservation = service.delete(1);
+      const deletReservation = controller.deleteReservation(1);
 
       expect(deletReservation).toEqual('Reservation with id: 1 has been deleted');
       expect(service.delete).toHaveBeenCalledTimes(1);

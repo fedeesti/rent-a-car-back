@@ -1,5 +1,9 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { ReservationService } from '../application/reservation.service';
+import { CreateReservationDto, UpdateReservationDto } from './reservation.dto';
+import { ValidationPipe } from '../../../common/interface/validation.pipe';
+import { mapRequestDtoToReservationEntity } from './reservation.mapper';
+import { Reservation } from '../domain/reservation.entity';
 
 @Controller('reservation')
 export class ReservationController {
@@ -16,14 +20,16 @@ export class ReservationController {
   }
 
   @Post()
-  createReservation(@Body() createReservationDto: any) {
-    return this.service.create(createReservationDto);
+  createReservation(@Body(new ValidationPipe()) createReservationDto: CreateReservationDto) {
+    const newReservation: Reservation = mapRequestDtoToReservationEntity(createReservationDto);
+
+    return this.service.create(newReservation);
   }
 
   @Patch(':reservationId')
   updateReservation(
     @Param('reservationId', ParseIntPipe) reservationId: number,
-    @Body() fieldsToUpdate: any
+    @Body(new ValidationPipe()) fieldsToUpdate: UpdateReservationDto
   ) {
     return this.service.update(reservationId, fieldsToUpdate);
   }
