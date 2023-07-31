@@ -13,6 +13,7 @@ export const mockArrayOfCars: Car[] = [
     year: 2016,
     transmission: 'manual',
     airConditioner: true,
+    reservations: [],
     deletedAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -34,6 +35,7 @@ export const mockCar: Car = {
   deletedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
+  reservations: [],
 };
 
 export const mockCarDto = {

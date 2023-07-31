@@ -1,3 +1,4 @@
+import { Reservation } from '../../reservation/domain/reservation.entity';
 import { BaseEntity } from '../../../common/domain/base.entity';
 export class Car extends BaseEntity {
   public brand: string;
@@ -10,5 +11,6 @@ export class Car extends BaseEntity {
   public year: number;
   public transmission: string;
   public airConditioner: boolean;
+  public reservations: Reservation[];
   public deletedAt: Date;
 }
