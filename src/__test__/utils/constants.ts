@@ -13,12 +13,6 @@ export const testOrmConfig: TypeOrmModuleOptions = {
 
 export const arraywithInvalidId = ['1,5', '0,4', ',2', 'a_c', 'a-c', '-1', '1-', 'a*c', 'a+c'];
 
-export const notFoundException = {
-  message: `Car with id 2 not found`,
-  error: 'Not Found',
-  statusCode: 404,
-};
-
 export const badRequestIdValidation = {
   message: 'Validation failed (numeric string is expected)',
   error: 'Bad Request',
@@ -35,16 +29,4 @@ export const errorFileIsRequired = {
   message: 'File is required',
   error: 'Bad Request',
   statusCode: 400,
-};
-
-export const mockInvalidCarDto = {
-  brand: '',
-  model: 207,
-  color: true,
-  kms: 'test',
-  passengers: 'test',
-  price: 'test',
-  year: 'test',
-  transmission: true,
-  airConditioner: 'undefined',
 };
