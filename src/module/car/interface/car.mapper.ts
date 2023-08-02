@@ -1,7 +1,7 @@
 import { Car } from '../domain/car.entity';
-import { CreateCarDto } from './car.dto';
+import { CreateCarDto, UpdateCarDto } from './car.dto';
 
-export function mapRequestToEntity(request: CreateCarDto, path: string): Car {
+export function mapRequestToEntity(request: CreateCarDto | UpdateCarDto, path: string): Car {
   const car = new Car();
   car.brand = request.brand;
   car.model = request.model;

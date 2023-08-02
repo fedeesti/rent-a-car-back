@@ -72,7 +72,7 @@ describe('CarController', () => {
   });
 
   describe('PATCH /cars/:id', () => {
-    it('should return an object specifying a row has been updated', async () => {
+    it('should update a car successfully', async () => {
       jest.spyOn(carService, 'update').mockImplementation(() => Promise.resolve(mockCar as Car));
 
       const updatedCarDto = new UpdateCarDto();
@@ -85,7 +85,7 @@ describe('CarController', () => {
   });
 
   describe('DELETE /cars/:id', () => {
-    it('should return an object specifying a row has been deleted.', async () => {
+    it('should delete a car successfully', async () => {
       jest
         .spyOn(carService, 'delete')
         .mockImplementation(() => Promise.resolve(mockCar as unknown as Promise<Car>));

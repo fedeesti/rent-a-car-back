@@ -45,6 +45,7 @@ export class CarController {
     @Body(new ValidationPipe()) carDto: CreateCarDto
   ) {
     const path = file.path.split('uploads\\')[1];
+
     const car: Car = mapRequestToEntity(carDto, path);
 
     return this.service.create(car);
@@ -56,8 +57,19 @@ export class CarController {
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile(new ParseFilePipe({ fileIsRequired: false })) file: Express.Multer.File,
     @Body(new ValidationPipe()) fieldsToUpdate: UpdateCarDto
-  ): Promise<Car> {
-    return this.service.update(id, fieldsToUpdate);
+  ) {
+    let path: string;
+
+    if (file) {
+      path = file.path.split('uploads\\')[1];
+    } else {
+      path = fieldsToUpdate.img;
+    }
+
+    const updateCar: Car = mapRequestToEntity(fieldsToUpdate, path);
+    updateCar.id = id;
+
+    return this.service.update(id, updateCar);
   }
 
   @Delete(':id')
