@@ -76,11 +76,12 @@ describe('CarController', () => {
       jest.spyOn(carService, 'update').mockImplementation(() => Promise.resolve(mockCar as Car));
 
       const updatedCarDto = new UpdateCarDto();
+      const car = new Car();
       const updatedCar = await carController.update(1, mockFile, updatedCarDto);
 
       expect(updatedCar).toEqual(mockCar);
       expect(carService.update).toHaveBeenCalledTimes(1);
-      expect(carService.update).toHaveBeenCalledWith(1, updatedCarDto);
+      expect(carService.update).toHaveBeenCalledWith(1, car);
     });
   });
 
