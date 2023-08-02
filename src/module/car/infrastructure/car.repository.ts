@@ -34,11 +34,11 @@ export class CarRepository implements ICarRepository {
   }
 
   async create(car: Car): Promise<Car> {
-    await this.repository.save(car);
-    return car;
+    const create = await this.repository.save(car);
+    return create;
   }
 
-  async update(id: number, fieldsToUpdate: Partial<CreateCarDto>): Promise<Car> {
+  async update(id: number, fieldsToUpdate: Partial<Car>): Promise<Car> {
     const updateCar = {
       id,
       ...fieldsToUpdate,

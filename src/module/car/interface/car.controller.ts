@@ -10,11 +10,11 @@ import {
   UploadedFile,
   UseInterceptors,
   ParseFilePipe,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CarService } from '../application/car.service';
 import { CreateCarDto, UpdateCarDto } from './car.dto';
 import { Car } from '../domain/car.entity';
-import { ValidationPipe } from '../../../common/interface/validation.pipe';
 import { mapRequestToEntity } from './car.mapper';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from '../../../config/multer.config';
@@ -42,7 +42,7 @@ export class CarController {
   @UseInterceptors(FileInterceptor('img', multerOptions))
   save(
     @UploadedFile(new ParseFilePipe({ fileIsRequired: true })) file: Express.Multer.File,
-    @Body(new ValidationPipe()) carDto: CreateCarDto
+    @Body(new ValidationPipe({ transform: true })) carDto: CreateCarDto
   ) {
     const path = file.path.split('uploads\\')[1];
 
@@ -56,7 +56,7 @@ export class CarController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile(new ParseFilePipe({ fileIsRequired: false })) file: Express.Multer.File,
-    @Body(new ValidationPipe()) fieldsToUpdate: UpdateCarDto
+    @Body(new ValidationPipe({ transform: true })) fieldsToUpdate: UpdateCarDto
   ) {
     let path: string;
 
@@ -67,7 +67,6 @@ export class CarController {
     }
 
     const updateCar: Car = mapRequestToEntity(fieldsToUpdate, path);
-    updateCar.id = id;
 
     return this.service.update(id, updateCar);
   }

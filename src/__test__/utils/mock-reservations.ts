@@ -38,30 +38,17 @@ export const reservationNotFoundMsgError = {
 
 export const reservationBadRequestValidationWithEmptyFields = {
   message: [
-    {
-      field: 'startDate',
-      error: 'startDate must be a valid ISO 8601 date string',
-    },
-    {
-      field: 'finishDate',
-      error: 'finishDate must be a valid ISO 8601 date string',
-    },
-    {
-      field: 'pricePerDay',
-      error: 'pricePerDay should not be empty',
-    },
-    {
-      field: 'totalPrice',
-      error: 'totalPrice must be a number conforming to the specified constraints',
-    },
-    {
-      field: 'paymentMethod',
-      error: 'paymentMethod must be a string',
-    },
-    {
-      field: 'statusId',
-      error: 'statusId must be a boolean value',
-    },
+    'startDate must be a valid ISO 8601 date string',
+    'startDate should not be empty',
+    'finishDate must be a valid ISO 8601 date string',
+    'finishDate should not be empty',
+    'pricePerDay should not be empty',
+    'totalPrice must be a number conforming to the specified constraints',
+    'totalPrice should not be empty',
+    'paymentMethod must be a string',
+    'paymentMethod should not be empty',
+    'statusId must be a boolean value',
+    'statusId should not be empty',
   ],
   error: 'Bad Request',
   statusCode: 400,

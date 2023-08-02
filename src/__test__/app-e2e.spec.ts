@@ -36,7 +36,7 @@ describe('App e2e', () => {
     await app.init();
   });
 
-  describe.only('Cars module', () => {
+  describe('Cars module', () => {
     describe('GET', () => {
       it(`should return an array of cars`, async () => {
         const { body } = await request(app.getHttpServer()).get('/cars').expect(200);
