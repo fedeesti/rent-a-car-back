@@ -36,7 +36,7 @@ describe('App e2e', () => {
     await app.init();
   });
 
-  describe('Cars module', () => {
+  describe.only('Cars module', () => {
     describe('GET', () => {
       it(`should return an array of cars`, async () => {
         const { body } = await request(app.getHttpServer()).get('/cars').expect(200);
@@ -123,7 +123,6 @@ describe('App e2e', () => {
             .attach('img', Buffer.alloc(1024, 'fake'), 'test.jpg')
             .field('brand', 'testPatch')
             .expect(200);
-
           expect(body.brand).toEqual('testPatch');
         });
       });
@@ -139,9 +138,8 @@ describe('App e2e', () => {
           }
         });
 
-        it('when the car does not exist in the database, it should return a not found error message', async () => {
+        it('when the car does not exist, should return a not found error message', async () => {
           const { body } = await request(app.getHttpServer()).patch('/cars/2').expect(404);
-
           expect(body).toEqual(carNotFoundException);
         });
 

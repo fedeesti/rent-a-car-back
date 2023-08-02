@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { IntersectionType, PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsNotEmpty, IsNumber, IsString, MinLength } from 'class-validator';
 
@@ -39,4 +39,8 @@ export class CreateCarDto {
   airConditioner: boolean;
 }
 
-export class UpdateCarDto extends PartialType(CreateCarDto) {}
+class CarAdditionalImage {
+  img: string;
+}
+
+export class UpdateCarDto extends IntersectionType(PartialType(CreateCarDto), CarAdditionalImage) {}
